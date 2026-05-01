@@ -36,7 +36,7 @@
     button { font: inherit; }
     body {
       font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
-                   Arial, "Noto Sans", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      Arial, "Noto Sans", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       background-color: var(--bg);
       color: var(--text);
       background-image: var(--bg-img);
@@ -167,9 +167,9 @@
       box-shadow: 0 6px 18px rgba(102, 126, 234, 0.28);
     }
 
-    .btn-primary:hover:not(:disabled) { 
-      transform: translateY(-2px); 
-      box-shadow: 0 10px 26px rgba(102, 126, 234, 0.38); 
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(102, 126, 234, 0.38);
     }
 
     .btn-outline {
@@ -789,10 +789,10 @@
         background-image: none;
       }
 
-      .container { 
+      .container {
         padding: 0.8rem;
       }
-      
+
       .header {
         gap: 0.5rem;
         margin-bottom: 1rem;
@@ -876,8 +876,8 @@
         font-size: 1.2rem;
       }
 
-      .stat-label { 
-        font-size: 0.7rem; 
+      .stat-label {
+        font-size: 0.7rem;
       }
 
       /* 成员卡 */
@@ -906,13 +906,13 @@
         padding: 0.1rem 0;
       }
 
-      .info-label { 
-        font-size: 0.7rem; 
+      .info-label {
+        font-size: 0.7rem;
         opacity: 0.85;
       }
 
-      .info-value { 
-        font-size: 0.82rem; 
+      .info-value {
+        font-size: 0.82rem;
       }
 
       /* 段落标题 */
@@ -958,7 +958,7 @@
     }
 
     @media (max-width: 480px) {
-      .container { 
+      .container {
         padding: 0.6rem;
       }
 
@@ -1003,11 +1003,11 @@
         font-size: 0.9rem;
       }
 
-      .info-label { 
+      .info-label {
         font-size: 0.65rem;
       }
 
-      .info-value { 
+      .info-value {
         font-size: 0.8rem;
       }
 
@@ -1026,7 +1026,7 @@
     }
 
     @media (max-width: 360px) {
-      .container { 
+      .container {
         padding: 0.5rem;
       }
 
@@ -1076,8 +1076,8 @@
         margin-bottom: 0.15rem;
       }
 
-      .stat-label { 
-        font-size: 0.65rem; 
+      .stat-label {
+        font-size: 0.65rem;
       }
 
       .member-card {
@@ -1101,11 +1101,11 @@
         padding: 0.08rem 0;
       }
 
-      .info-label { 
+      .info-label {
         font-size: 0.62rem;
       }
 
-      .info-value { 
+      .info-value {
         font-size: 0.78rem;
       }
 
@@ -1386,7 +1386,7 @@
       </div>
 
       <div class="header-time">🕐 <span id="refresh-time">--:--:--</span></div>
-      
+
       <div class="header-actions">
         <button class="btn btn-outline" onclick="copyKanbanLink()" title="复制链接">🔗 复制链接</button>
         <button class="btn btn-primary" id="refresh-button" title="刷新数据">🔄 刷新数据</button>
@@ -1453,48 +1453,48 @@
             <div>正在连接 ZeroTier 云端...</div>
           </div>
         </div>
-    </div>
-
-    <!-- Pending Members (仅私有网络显示) -->
-    <div class="section" id="pending-section">
-      <div class="section-header">
-        <div>
-          <span class="section-title">⏳ 待授权</span>
-          <span class="section-count" id="pending-count"></span>
-        </div>
       </div>
-      <div id="pending-members"></div>
-    </div>
-  </div>
 
-
-  <!-- 编辑成员弹窗 -->
-  <div id="edit-panel-mask" class="edit-mask" style="display:none;">
-    <div class="edit-panel">
-      <form id="edit-form" autocomplete="off">
-        <h2 class="edit-panel-title">编辑设备信息</h2>
-        <input type="hidden" id="edit-nodeId" />
-
-        <div class="edit-form-group">
-          <label for="edit-name">名称</label>
-          <input id="edit-name" maxlength="20" />
+      <!-- Pending Members (仅私有网络显示) -->
+      <div class="section" id="pending-section">
+        <div class="section-header">
+          <div>
+            <span class="section-title">⏳ 待授权</span>
+            <span class="section-count" id="pending-count"></span>
+          </div>
         </div>
-        <div class="edit-form-group">
-          <label for="edit-desc">备注</label>
-          <input id="edit-desc" maxlength="64" />
-        </div>
-        <div class="edit-form-group">
-          <label for="edit-ip">IPv4</label>
-          <input id="edit-ip" maxlength="15"/>
-        </div>
-        <div class="edit-form-action">
-          <button type="button" class="btn btn-outline" id="edit-cancel">取消</button>
-          <button type="submit" class="btn btn-primary" id="edit-save"><span class="save-text">保存</span></button>
-        </div>
-      </form>
+        <div id="pending-members"></div>
+      </div>
     </div>
 
-  </div>
+
+    <!-- 编辑成员弹窗 -->
+    <div id="edit-panel-mask" class="edit-mask" style="display:none;">
+      <div class="edit-panel">
+        <form id="edit-form" autocomplete="off">
+          <h2 class="edit-panel-title">编辑设备信息</h2>
+          <input type="hidden" id="edit-nodeId" />
+
+          <div class="edit-form-group">
+            <label for="edit-name">名称</label>
+            <input id="edit-name" maxlength="20" />
+          </div>
+          <div class="edit-form-group">
+            <label for="edit-desc">备注</label>
+            <input id="edit-desc" maxlength="64" />
+          </div>
+          <div class="edit-form-group">
+            <label for="edit-ip">IPv4</label>
+            <input id="edit-ip" maxlength="15"/>
+          </div>
+          <div class="edit-form-action">
+            <button type="button" class="btn btn-outline" id="edit-cancel">取消</button>
+            <button type="submit" class="btn btn-primary" id="edit-save"><span class="save-text">保存</span></button>
+          </div>
+        </form>
+      </div>
+
+    </div>
 
 
     <footer class="app-footer">
@@ -1504,24 +1504,24 @@
           <span class="footer-title">ZTPanel</span>
           <span class="footer-divider">·</span>
           <span class="footer-license" id="footer-license">
-        MIT License
-      </span>
+          MIT License
+        </span>
         </div>
 
         <div class="footer-right">
           <a href="https://github.com/Zakkoree/ZTPanel" target="_blank" class="footer-link">
-        <span class="footer-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 .5C5.65.5.75 5.4.75 11.75c0 5.1 3.3 9.4 7.9 10.95.6.1.8-.25.8-.55v-2.15c-3.2.7-3.9-1.55-3.9-1.55-.55-1.35-1.35-1.7-1.35-1.7-1.1-.75.1-.75.1-.75 1.2.1 1.85 1.25 1.85 1.25 1.1 1.85 2.9 1.3 3.6 1 .1-.8.4-1.3.75-1.6-2.55-.3-5.25-1.3-5.25-5.7 0-1.25.45-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.15 0 0 1-.3 3.25 1.2a11.3 11.3 0 0 1 5.9 0c2.25-1.5 3.25-1.2 3.25-1.2.6 1.65.2 2.85.1 3.15.75.8 1.2 1.85 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.45.4.8 1.1.8 2.2v3.25c0 .3.2.65.8.55 4.6-1.55 7.9-5.85 7.9-10.95C23.25 5.4 18.35.5 12 .5z"/>
-          </svg>
-        </span>
+          <span class="footer-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 .5C5.65.5.75 5.4.75 11.75c0 5.1 3.3 9.4 7.9 10.95.6.1.8-.25.8-.55v-2.15c-3.2.7-3.9-1.55-3.9-1.55-.55-1.35-1.35-1.7-1.35-1.7-1.1-.75.1-.75.1-.75 1.2.1 1.85 1.25 1.85 1.25 1.1 1.85 2.9 1.3 3.6 1 .1-.8.4-1.3.75-1.6-2.55-.3-5.25-1.3-5.25-5.7 0-1.25.45-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.15 0 0 1-.3 3.25 1.2a11.3 11.3 0 0 1 5.9 0c2.25-1.5 3.25-1.2 3.25-1.2.6 1.65.2 2.85.1 3.15.75.8 1.2 1.85 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.45.4.8 1.1.8 2.2v3.25c0 .3.2.65.8.55 4.6-1.55 7.9-5.85 7.9-10.95C23.25 5.4 18.35.5 12 .5z"/>
+            </svg>
+          </span>
             GitHub
           </a>
         </div>
 
       </div>
     </footer>
-
+  </div>
   <div id="toast" class="toast"></div>
 
   <script>
@@ -1556,7 +1556,7 @@
         el.textContent = `MIT License © ${year}`;
       }
     })();
-    
+
     switchNetworkBtn.onclick = () => {window.location.href = `networks?token=${encodeURIComponent(token)}`};
 
     function closeAllMemberMenus() {
@@ -1628,7 +1628,7 @@
       const cards = document.querySelectorAll('.member-card[data-section="authorized"]');
       cards.forEach(card => {
         const isOnlineCard = card.dataset.online === 'yes';
-        
+
         if (currentFilter === 'all') {
           card.classList.remove('hidden');
         } else if (currentFilter === 'online') {
@@ -1647,7 +1647,7 @@
 
       let actionMenu = '';
       if (isPrivateNetwork) {
-        
+
         actionMenu = `
           <button class="menu-item" onclick="event.stopPropagation(); ${auth ? "unauthorize" : "authorize"}('${m.nodeId}'); closeAllMemberMenus();">
             ${auth ? '🔒 取消授权' : '✅ 授权加入'}
@@ -1658,7 +1658,7 @@
 
       return `
         <div class="member-card ${isFirstRender ? 'animate-in' : ''}" data-section="authorized" data-online="${online ? 'yes' : 'no'}">
-          
+
           <div class="member-head">
             <div class="member-name">
               <span class="name-text" title="${m.name || '未命名'}">${m.name || '未命名'}</span>
@@ -1670,7 +1670,7 @@
             <div class="member-menu" data-menu-for="${m.nodeId}">
               <button class="menu-trigger" onclick="toggleMemberMenu(event, '${m.nodeId}')" title="操作">⋯</button>
               <div class="menu-panel">
-                <button class="menu-item" onclick="event.stopPropagation(); 
+                <button class="menu-item" onclick="event.stopPropagation();
                 document.getElementById('edit-panel-mask').style.display = 'flex';
                 document.getElementById('edit-nodeId').value = '${m.nodeId}';
                 document.getElementById('edit-name').value = '${m.name ? m.name : ''}';
@@ -1687,7 +1687,7 @@
                 </button>
               </div>
             </div>
-            
+
           </div>
 
           <div class="member-info-item">
@@ -1827,7 +1827,7 @@
         const c = d.config;
         isPrivateNetwork = c.private !== false;
         const networkOverviewContainer = document.getElementById('overview-title');
-        
+
         let ips = '-';
         if (Array.isArray(c.ipAssignmentPools) && c.ipAssignmentPools.length) {
           ips = c.ipAssignmentPools.map(p => `${p.ipRangeStart || p.start} → ${p.ipRangeEnd || p.end}`).join(', ');
@@ -1837,20 +1837,20 @@
           <span class="net-tag tag-${isPrivateNetwork ? 'blue' : 'orange'}" >${isPrivateNetwork ? '私有' : '公共'}</span>
           ${d.description ? `<span class="net-tag tag-gray" title="${d.description}">${d.description}</span>` : ''}
         `;
-        
-        
+
+
         const routesHtml  = Array.isArray(c.routes) && c.routes.length
-        ? c.routes.map(route => {
-            const target = route.target || route.destination || '-';
-            const via = (route.via ? ('via → ' + route.via) : (route.viaRouter ? ('via → ' + route.viaRouter) : ('(LAN) ' + ips)));
-            return `
+                ? c.routes.map(route => {
+                  const target = route.target || route.destination || '-';
+                  const via = (route.via ? ('via → ' + route.via) : (route.viaRouter ? ('via → ' + route.viaRouter) : ('(LAN) ' + ips)));
+                  return `
               <div class="route-item-inline">
                 <span class="route-target">${target}</span>
                 <span class="route-via">${via}</span>
               </div>
               `;
-          }).join('')
-        : '-';
+                }).join('')
+                : '-';
         document.getElementById('network-routes').innerHTML = routesHtml ;
       }
     }
@@ -1858,7 +1858,7 @@
     function renderData(d) {
       if (!Array.isArray(d)) return;
       allMembers = d;
-      
+
       const auth = d.filter(m => m.config.authorized);
       const pend = d.filter(m => !m.config.authorized);
       const on = auth.filter(isOnline).length;
@@ -1872,8 +1872,8 @@
       document.getElementById('pending-count').textContent = pend.length ? ` (${pend.length})` : '';
 
       authContainer.innerHTML = auth.length
-        ? auth.map(m => renderMember(m, true)).join('')
-        : `<div class="empty-state">
+              ? auth.map(m => renderMember(m, true)).join('')
+              : `<div class="empty-state">
             <!-- 使用 SVG 图标，比 Emoji 更清晰专业 -->
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); opacity: 0.6;">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -1889,7 +1889,7 @@
       } else {
         pendingSection.style.display = 'none';
       }
-      
+
       // 获取上次选择的筛选项
       const saved = localStorage.getItem(`ztFilter_${netId}`);
       currentFilter = saved || 'all';
@@ -1922,7 +1922,7 @@
             throw new Error(`API Error: ${r.statusText}`);
           }
         }
-        
+
         const d = await r.json();
         setCached(d);
         renderData(d);
@@ -1937,7 +1937,7 @@
     updateTime();
     setInterval(fetchData, 60000);
 
-    
+
     document.getElementById('refresh-button').addEventListener('click', () => {
       const btn = document.getElementById('refresh-button');
       btn.disabled = true;
@@ -2051,12 +2051,12 @@
       // 这一步比较高级，它会智能截断，比如输入 "1234" 会自动变回 "123"
       const parts = value.split('.');
       if (parts.length > 4) {
-          // 如果段数超过4段，截取前4段
-          value = parts.slice(0, 4).join('.');
+        // 如果段数超过4段，截取前4段
+        value = parts.slice(0, 4).join('.');
       } else {
-          // 检查每一段是否超过3位
-          const newParts = parts.map(part => part.slice(0, 3));
-          value = newParts.join('.');
+        // 检查每一段是否超过3位
+        const newParts = parts.map(part => part.slice(0, 3));
+        value = newParts.join('.');
       }
       // 更新输入框的值
       e.target.value = value;
