@@ -231,13 +231,22 @@
       justify-content: space-between;
       align-items: flex-start;
       gap: 0.7rem;
+      min-width: 0;
     }
+    .card-header.animate-in {
+      animation: fadeSlideIn 0.35s ease;
+    }
+
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
     .network-name {
       font-size: 1.02rem;
       font-weight: 950;
       color: var(--dark);
-      word-break: break-all;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
 
     .network-id {
@@ -356,117 +365,6 @@
       .header {
         grid-template-columns: auto 1fr auto;
         gap: 1rem;
-      }
-    }
-
-    @media (max-width: 1024px) {
-      .header {
-        grid-template-columns: auto 1fr auto;
-        gap: 0.8rem;
-      }
-
-      .header-actions {
-        gap: 0.4rem;
-      }
-
-      .btn {
-        padding: 0.5rem 0.9rem;
-        font-size: 0.82rem;
-        min-height: 36px;
-      }
-
-      .network-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      }
-    }
-
-    @media (max-width: 896px) {
-      .header {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-        border-bottom: none;
-        padding-bottom: 0;
-      }
-
-      .header-title {
-        grid-column: 1;
-      }
-
-      .header-time {
-        grid-column: 1;
-      }
-
-      .header-actions {
-        grid-column: 1;
-        width: 100%;
-      }
-
-      .header-actions .btn {
-        flex: 1;
-      }
-
-      .network-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 768px) {
-      body {
-        background-attachment: scroll;
-        background-position: right -20px top 55%;
-        background-size: 460px auto;
-      }
-
-      .container {
-        padding: 1rem;
-      }
-
-      .header {
-        gap: 0.6rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .header-title {
-        font-size: 1.3rem;
-      }
-
-      .header-time {
-        font-size: 0.9rem;
-      }
-
-      .header-actions {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .header-actions .btn {
-        width: 100%;
-      }
-
-      .network-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-
-      .network-card {
-        padding: 1rem;
-      }
-
-      .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.6rem;
-      }
-
-      .stat-item {
-        min-width: 0;
-      }
-
-      .stat-value {
-        font-size: 1.2rem;
-      }
-
-      .stat-label {
-        font-size: 0.7rem;
       }
     }
 
@@ -699,6 +597,123 @@
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     }
+
+    /* ===== Footer ===== */
+    .app-footer {
+      margin-top: 2rem;
+      padding: 1.2rem 1rem;
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(8px);
+      animation: footerFadeIn 0.6s ease forwards;
+    }
+
+    /* 淡入动画 */
+    @keyframes footerFadeIn {
+      to {
+        opacity: 0.75;
+        transform: none;
+      }
+    }
+
+    .app-footer:hover {
+      opacity: 1;
+    }
+
+    /* 布局 */
+    .footer-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    /* 左侧 */
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      font-weight: 700;
+    }
+
+    .footer-title {
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    .footer-divider {
+      opacity: 0.5;
+    }
+
+    .footer-license {
+      opacity: 0.85;
+    }
+
+    /* 右侧 */
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-light);
+      text-decoration: none;
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--primary);
+      background: var(--surface-2);
+      transform: translateY(-1px);
+    }
+
+    /* GitHub SVG */
+    .footer-icon svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .footer-link:hover .footer-icon svg {
+      transform: scale(1.15);
+    }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 640px) {
+      .app-footer {
+        padding: 1rem 0.6rem;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.5rem;
+      }
+
+      .footer-left {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .footer-link {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .flex-1-min-w-0 {
+      min-width: 0; /* 允许宽度压缩到 0 */
+      display: flex; /* 保持 flex 布局特性 */
+      flex-direction: column; /* 让子元素垂直排列 */
+    }
   </style>
 </head>
 <body>
@@ -727,7 +742,35 @@
       </div>
       <div id="networkGrid" class="network-grid"></div>
     </main>
+
+
+    <footer class="app-footer">
+      <div class="footer-inner">
+
+        <div class="footer-left">
+          <span class="footer-title">ZTPanel</span>
+          <span class="footer-divider">·</span>
+          <span class="footer-license" id="footer-license">
+        MIT License
+      </span>
+        </div>
+
+        <div class="footer-right">
+          <a href="https://github.com/Zakkoree/ZTPanel" target="_blank" class="footer-link">
+        <span class="footer-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 .5C5.65.5.75 5.4.75 11.75c0 5.1 3.3 9.4 7.9 10.95.6.1.8-.25.8-.55v-2.15c-3.2.7-3.9-1.55-3.9-1.55-.55-1.35-1.35-1.7-1.35-1.7-1.1-.75.1-.75.1-.75 1.2.1 1.85 1.25 1.85 1.25 1.1 1.85 2.9 1.3 3.6 1 .1-.8.4-1.3.75-1.6-2.55-.3-5.25-1.3-5.25-5.7 0-1.25.45-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.15 0 0 1-.3 3.25 1.2a11.3 11.3 0 0 1 5.9 0c2.25-1.5 3.25-1.2 3.25-1.2.6 1.65.2 2.85.1 3.15.75.8 1.2 1.85 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.45.4.8 1.1.8 2.2v3.25c0 .3.2.65.8.55 4.6-1.55 7.9-5.85 7.9-10.95C23.25 5.4 18.35.5 12 .5z"/>
+          </svg>
+        </span>
+            GitHub
+          </a>
+        </div>
+
+      </div>
+    </footer>
   </div>
+
+
 
   <div id="toast" class="toast"></div>
 
@@ -740,7 +783,18 @@
     const errorState = document.getElementById('errorState');
     const errorTitle = document.getElementById('errorTitle');
     const errorMessage = document.getElementById('errorMessage');
+
+    let isFirstRender = true;
     let allNetworks = [];
+
+    /* ===== 自动年份 ===== */
+    (function () {
+      const el = document.getElementById('footer-license');
+      if (el) {
+        const year = new Date().getFullYear();
+        el.textContent = `MIT License © ${year}`;
+      }
+    })();
 
     function showToast(msg) {
       let toast = document.getElementById('toast');
@@ -821,7 +875,7 @@
         card.onclick = () => {
           window.location.href = `dashboard?token=${encodeURIComponent(token)}&net_id=${encodeURIComponent(net.id)}`;
         };
-        const description = config.description || '暂无描述';
+        const description = net.description || '暂无描述';
         const isPrivate = config.private === false ? '公开' : '私有';
         const statusClass = config.private === false ? 'public' : '';
         const memberCount = net.totalMemberCount || 0;
@@ -829,9 +883,9 @@
         const onlineMemberCount = net.onlineMemberCount || 0;
 
         card.innerHTML = `
-          <div class="card-header">
-            <div>
-              <div class="network-name">${config.name || '未命名网络'}</div>
+          <div class="card-header ${isFirstRender ? 'animate-in' : ''}">
+            <div class="flex-1-min-w-0">
+              <div class="network-name" title="${config.name || '未命名'}">${config.name || '未命名'}</div>
               <div class="network-id">${net.id}</div>
             </div>
             <span class="status-badge ${statusClass}">${isPrivate}</span>
@@ -853,6 +907,11 @@
           </div>
         `;
         networkGrid.appendChild(card);
+        if (isFirstRender) {
+          setTimeout(() => {
+            isFirstRender = false;
+          }, 400); // 等动画结束
+        }
       });
     }
 
