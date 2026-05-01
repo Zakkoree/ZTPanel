@@ -1,0 +1,384 @@
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="32x32">
+  <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="192x192">
+  <title>ZTPanel</title>
+  <style>
+    html, body, .setup-container {
+      max-width: 100vw;
+      overflow-x: hidden !important;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      position: relative;
+      overflow: hidden;
+      padding: 1rem;
+    }
+    
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><path d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/></g></g></svg>');
+      animation: drift 20s infinite linear;
+    }
+    
+    @keyframes drift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(60px, 60px); }
+    }
+    
+    .setup-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .setup-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+    }
+
+    /* 背景图 - 居中显示 */
+    .setup-card::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 35%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 400px;
+      background-image: url("https://www.zerotier.com/wp-content/uploads/2026/04/Globe-260323v01-DRAFT.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.50;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* 让内容在伪元素上面 */
+    .setup-card > * {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .setup-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .setup-logo {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .setup-logo img {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .setup-header h1 {
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .setup-header p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group input {
+      font-size: 16px; /* 关键：防止 iOS 自动缩放触发输入法 */
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+      font-size: 0.9rem;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-hint {
+      display: block;
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
+      color: #999;
+    }
+    
+    .form-hint a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .submit-button {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1.5rem;
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .submit-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .submit-button:disabled {
+      cursor: not-allowed;
+    }
+    
+    .error-message {
+      color: #e74c3c;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: #ffebee;
+      border-radius: 6px;
+      display: none;
+      border-left: 3px solid #e74c3c;
+      font-size: 0.9rem;
+    }
+    
+    .error-message.show {
+      display: block;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 480px) {
+      body {
+        padding: 0.5rem;
+      }
+
+      .setup-container {
+        max-width: 100%;
+      }
+
+      .setup-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+      }
+
+      /* 手机端缩小背景图 */
+      .setup-card::before {
+        width: 240px;
+        height: 240px;
+        opacity: 0.1;
+      }
+
+      .setup-header {
+        margin-bottom: 1.5rem;
+      }
+
+      .setup-logo img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .setup-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .setup-header p {
+        font-size: 0.9rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group label {
+        font-size: 0.85rem;
+      }
+
+      .form-group input {
+        padding: 0.65rem 0.9rem;
+        font-size: 16px; /* 防止 iOS 自动缩放 */
+      }
+
+      .form-hint {
+        font-size: 0.75rem;
+      }
+
+      .submit-button {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        margin-top: 1rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .setup-card {
+        padding: 1.25rem;
+      }
+
+      .setup-card::before {
+        width: 200px;
+        height: 200px;
+        opacity: 0.08;
+      }
+
+      .setup-logo img {
+        width: 45px;
+        height: 45px;
+      }
+
+      .setup-header h1 {
+        font-size: 1.4rem;
+      }
+
+      .setup-header p {
+        font-size: 0.85rem;
+      }
+
+      .form-group input {
+        padding: 0.6rem 0.8rem;
+        font-size: 16px;
+      }
+
+      .submit-button {
+        padding: 0.7rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="setup-container">
+    <div class="setup-card">
+      <div class="setup-header">
+        <div class="setup-logo"><img src="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg"/></div>
+        <h1>ZT Panel</h1>
+        <p>ZeroTier 网络可视化管理</p>
+      </div>
+      
+      <div id="error-message" class="error-message"></div>
+      
+      <form id="setup-form">
+        <div class="form-group">
+          <label for="token">🔑 访问令牌</label>
+          <input type="text" id="token" placeholder="输入访问令牌" required autocomplete="off" autofocus maxlength="32">
+          <small class="form-hint">在 <a href="https://my.zerotier.com/account#tokens" target="_blank">令牌页面</a> 获取</small>
+        </div>
+        
+        <button type="submit" class="submit-button">开始使用</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+
+
+    const tokenInput = document.getElementById('token');
+  
+    tokenInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\s/g, '');
+    });
+
+    document.getElementById('setup-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const err = document.getElementById('error-message');
+      const btn = document.querySelector('.submit-button');
+      
+      err.classList.remove('show');
+      
+      const token = tokenInput.value.trim();
+      
+      if (token.length !== 32) {
+        err.textContent = '❌ 无效访问令牌！';
+        err.classList.add('show');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '⏳ 验证中...';
+
+      try {
+        const r = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/status')}`);
+        if (!r.ok) throw new Error(`API Error => ${r.statusText}`);
+        const d = await r.json();
+        if (!d.user) {
+          throw new Error(`无效访问令牌！`);
+        }
+        window.location.href = `/networks?token=${encodeURIComponent(token)}`;
+      } catch (e) {
+        console.error('❌ 验证失败:', e);
+        err.textContent = '❌ ' + e.message;
+        err.classList.add('show');
+        
+        btn.disabled = false;
+        btn.textContent = '开始使用';
+      }
+    });
+  </script>
+</body>
+</html>
