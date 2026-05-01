@@ -47,7 +47,7 @@ pnpm run deploy
 
 ## 🧪 在线 DEMO
 
-> **建议部署自己的实例。**
+> **已禁用 Workers 日志，放心食用，建议部署自己的实例。**
 
 [📎 ZTPanel 在线 DEMO](https://ztpanel.zakkoree.workers.dev)
 
@@ -56,7 +56,7 @@ pnpm run deploy
 ## 📖 常见问题
 
 **Q1：会不会泄露我的 ZeroTier Token？**  
-A：前端源码开源，后端仅用 Token 调 ZeroTier API，不做任何存储。
+A：仅用 Token 调 ZeroTier API，不做任何存储。
 
 **Q2：Token 怎么获取？**  
 A：[ZeroTier 官网 Token 获取地址](https://my.zerotier.com/account#tokens)
