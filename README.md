@@ -56,7 +56,7 @@ pnpm run deploy
 ## 📖 常见问题
 
 **Q1：会不会泄露我的 ZeroTier Token？**  
-A：仅用 Token 调 ZeroTier API，不做任何存储。
+A：仅本地使用 Token 调 ZeroTier API，不做任何存储。
 
 **Q2：Token 怎么获取？**  
 A：[ZeroTier 官网 Token 获取地址](https://my.zerotier.com/account#tokens)
