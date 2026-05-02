@@ -1918,7 +1918,7 @@
         if(Array.isArray(allNetworkRoutes) && allNetworkRoutes.length){
             allNetworkRoutes.forEach( route =>{if(route.via === ip) networkRoutesSpan = `<span class="status-route ${online ? 'blue' : ''}" title="${route.target || route.destination || ''}">
             <svg xmlns="http://www.w3.org/2000/svg" width="1.8rem" height="1.5rem" viewBox="0 0 200 150">
-              <g transform="translate(0,10)">
+              <g transform="translate(0,0)">
               <!-- 路由器主体 -->
               <rect x="30" y="80" width="140" height="40" rx="8" ry="8"  fill="none" stroke-width="10"/>
               <!-- 天线 -->
