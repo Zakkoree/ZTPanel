@@ -570,6 +570,11 @@
             -webkit-user-select: none;
         }
 
+        .status-route svg {
+            stroke: currentColor;
+            fill: none;
+        }
+
         /* Member menu */
         .member-menu {
             position: relative;
@@ -1909,8 +1914,25 @@
         `;
         }
         let networkRoutesSpan = '';
+        // 🖧
         if(Array.isArray(allNetworkRoutes) && allNetworkRoutes.length){
-            allNetworkRoutes.forEach( route =>{if(route.via === ip) networkRoutesSpan = `<span class="status-route ${online ? 'blue' : ''}" title="${route.target || route.destination || ''}">🖧</span>`})
+            allNetworkRoutes.forEach( route =>{if(route.via === ip) networkRoutesSpan = `<span class="status-route ${online ? 'blue' : ''}" title="${route.target || route.destination || ''}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.8rem" height="1.5rem" viewBox="0 0 200 150">
+              <g transform="translate(0,10)">
+              <!-- 路由器主体 -->
+              <rect x="30" y="80" width="140" height="40" rx="8" ry="8"  fill="none" stroke-width="10"/>
+              <!-- 天线 -->
+              <line x1="50" y1="80" x2="50" y2="40"  stroke-width="10"/>
+              <line x1="150" y1="80" x2="150" y2="40"  stroke-width="10"/>
+              <!-- 指示灯 -->
+              <circle cx="60" cy="100" r="3"/>
+              <circle cx="75" cy="100" r="3"/>
+              <circle cx="90" cy="100" r="3"/>
+              <circle cx="105" cy="100" r="3"/>
+              <circle cx="120" cy="100" r="3"/>
+              </g>
+            </svg>
+        </span>`})
         }
 
         return `
