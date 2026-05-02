@@ -543,7 +543,7 @@
             background: #cbd5e0;
         }
 
-        .status-text,.status-subnets {
+        .status-text {
             flex-shrink: 0;
             font-size: 0.76rem;
             color: var(--text-light);
@@ -558,15 +558,16 @@
             cursor: default;
         }
 
+        .status-route.blue,
         .status-text.blue {
-            color: #3182ce;
+            color: #1E90FF;
         }
 
-        .status-subnets {
-            color: #3f5db8;
-            padding: 0.15rem 0.3rem;
-            border-radius: 4px;
-            background: #cedefd;
+        .status-route {
+            color: var(--text-light);
+            user-select: none;
+            font-weight: 600;
+            -webkit-user-select: none;
         }
 
         /* Member menu */
@@ -1909,7 +1910,7 @@
         }
         let networkRoutesSpan = '';
         if(Array.isArray(allNetworkRoutes) && allNetworkRoutes.length){
-            allNetworkRoutes.forEach( route =>{if(route.via === ip) networkRoutesSpan = `<span class="status-subnets" title="${route.target || route.destination || ''}">Subnets</span>`})
+            allNetworkRoutes.forEach( route =>{if(route.via === ip) networkRoutesSpan = `<span class="status-route ${online ? 'blue' : ''}" title="${route.target || route.destination || ''}">🖧</span>`})
         }
 
         return `
@@ -2302,28 +2303,34 @@
         let value = e.target.value;
         // 1. 去除所有空格
         value = value.replace(/\s/g, '');
-        // 2. 只保留数字和点，删除其他字符（如字母、特殊符号）
+        // 2. 只保留数字和点
         value = value.replace(/[^\d.]/g, '');
-        // 3. 防止连续输入点 (例如把 "192..1" 变成 "192.1")
+        // 3. 防止连续输入点
         value = value.replace(/\.{2,}/g, '.');
-        // 4. (可选) 强制第一位必须是数字，防止以点开头
+        // 4. 防止以点开头
         if (value.startsWith('.')) {
             value = value.substring(1);
         }
-        // 5. (可选) 限制每一段的长度不超过 3 位
-        // 这一步比较高级，它会智能截断，比如输入 "1234" 会自动变回 "123"
-        const parts = value.split('.');
+        // 5. 限制段数和长度
+        let parts = value.split('.');
         if (parts.length > 4) {
-            // 如果段数超过4段，截取前4段
-            value = parts.slice(0, 4).join('.');
-        } else {
-            // 检查每一段是否超过3位
-            const newParts = parts.map(part => part.slice(0, 3));
-            value = newParts.join('.');
+            parts = parts.slice(0, 4);
         }
+        // 每段最多3位，且数值不超过255
+        parts = parts.map(part => {
+            let num = part.slice(0, 3); // 最多3位
+            if (num) {
+                let n = parseInt(num, 10);
+                if (n > 255) n = 255; // 超过255强制为255
+                return String(n);
+            }
+            return '';
+        });
+        value = parts.join('.');
         // 更新输入框的值
         e.target.value = value;
     });
+
 
     // 表单保存事件
     document.getElementById('edit-form').onsubmit = async function (e) {
