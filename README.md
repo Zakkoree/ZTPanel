@@ -49,9 +49,8 @@ pnpm run deploy
 
 > **已禁用 Workers 日志，放心食用，建议部署自己的实例。**
 
-[ztpanel.zakkoree.workers.dev](https://ztpanel.zakkoree.workers.dev)
-
-[zau.cc.cd](https://zau.cc.cd)
+- [ztpanel.zakkoree.workers.dev](https://ztpanel.zakkoree.workers.dev)
+- [zau.cc.cd](https://zau.cc.cd)
 
 ---
 
