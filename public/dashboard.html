@@ -543,18 +543,30 @@
             background: #cbd5e0;
         }
 
-        .status-text {
-            flex-shrink: 0; /* 新增：防止状态标签（在线/离线）被长名字挤压变形 */
+        .status-text,.status-subnets {
+            flex-shrink: 0;
             font-size: 0.76rem;
             color: var(--text-light);
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
             font-weight: 800;
+            user-select: none;
+            -webkit-user-select: none;
+
+            /* 改变光标样式 */
+            cursor: default;
         }
 
         .status-text.blue {
             color: #3182ce;
+        }
+
+        .status-subnets {
+            color: #3f5db8;
+            padding: 0.15rem 0.3rem;
+            border-radius: 4px;
+            background: #cedefd;
         }
 
         /* Member menu */
@@ -1779,6 +1791,7 @@
 
     let currentFilter = 'all';
     let allMembers = [];
+    let allNetworkRoutes;
     let isPrivateNetwork = true;
 
     /* ===== 自动年份 ===== */
@@ -1894,6 +1907,10 @@
           <div class="menu-sep"></div>
         `;
         }
+        let networkRoutesSpan = '';
+        if(Array.isArray(allNetworkRoutes) && allNetworkRoutes.length){
+            allNetworkRoutes.forEach( route =>{if(route.via === ip) networkRoutesSpan = `<span class="status-subnets" title="${route.target || route.destination || ''}">Subnets</span>`})
+        }
 
         return `
         <div class="member-card ${isFirstRender ? 'animate-in' : ''}" data-section="authorized" data-online="${online ? 'yes' : 'no'}">
@@ -1901,12 +1918,14 @@
           <div class="member-head">
             <div class="member-name">
               <span class="name-text" title="${m.name || '未命名'}">${m.name || '未命名'}</span>
-              <span class="status-text ${online ? 'blue' : ''}">
+            </div>
+            ${networkRoutesSpan}
+            <span class="status-text ${online ? 'blue' : ''}">
                 <span class="status-badge ${online ? 'online' : 'offline'}"></span>
                 ${online ? '在线' : '离线'}
-              </span>
-            </div>
+            </span>
             <div class="member-menu" data-menu-for="${m.nodeId}">
+
               <button class="menu-trigger" onclick="toggleMemberMenu(event, '${m.nodeId}')" title="操作">⋯</button>
               <div class="menu-panel">
                 <button class="menu-item" onclick="event.stopPropagation();
@@ -2070,7 +2089,7 @@
             const c = d.config;
             isPrivateNetwork = c.private !== false;
             const networkOverviewContainer = document.getElementById('overview-title');
-
+            allNetworkRoutes = c.routes;
             let ips = '-';
             if (Array.isArray(c.ipAssignmentPools) && c.ipAssignmentPools.length) {
                 ips = c.ipAssignmentPools.map(p => `${p.ipRangeStart || p.start} → ${p.ipRangeEnd || p.end}`).join(', ');
@@ -2084,8 +2103,9 @@
 
             document.getElementById('network-routes').innerHTML = Array.isArray(c.routes) && c.routes.length
                 ? c.routes.map(route => {
-                    const target = route.target || route.destination || '-';
+                    const target = route.target || route.destination || '';
                     const via = (route.via ? ('via → ' + route.via) : (route.viaRouter ? ('via → ' + route.viaRouter) : ('(LAN) ' + ips)));
+
                     return `
               <div class="route-item-inline">
                 <span class="route-target">${target}</span>
@@ -2093,7 +2113,7 @@
               </div>
               `;
                 }).join('')
-                : '-';
+                : '';
         }
     }
 
