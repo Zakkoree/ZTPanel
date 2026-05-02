@@ -1,1530 +1,1763 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="32x32">
-  <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="192x192">
-  <title>ZTPanel</title>
-  <style>
-    :root {
-      --primary: #667eea;
-      --secondary: #764ba2;
-      --success: #48bb78;
-      --warning: #f6ad55;
-      --danger:  #f56565;
-      --dark: #2d3748;
-      --text: #1f2937;
-      --text-light: #718096;
-      --border: #e2e8f0;
-      --bg: #f5f7fa;
-      --surface: #ffffff;
-      --surface-2: #f7fafc;
-      --radius: 12px;
-      --radius-sm: 10px;
-      --radius-xs: 8px;
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-      --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.12);
-      --ring: 0 0 0 3px rgba(102, 126, 234, 0.22);
-      --transition: 150ms ease;
-      --container: 1200px;
-      --bg-img: url("https://www.zerotier.com/wp-content/uploads/2026/04/Globe-260323v01-DRAFT.png");
-    }
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body, h1, h2, h3, p { margin: 0; }
-    button { font: inherit; }
-    body {
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
-      Arial, "Noto Sans", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      background-image: var(--bg-img);
-      background-repeat: no-repeat;
-      background-size: 680px auto;
-      background-position: right 22% top 55%;
-      background-attachment: fixed;
-      line-height: 1.45;
-    }
-    .container {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 1.5rem;
-      padding-left: max(1rem, env(safe-area-inset-left));
-      padding-right: max(1rem, env(safe-area-inset-right));
-      padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
-    }
-
-    /* ========== 头部布局 ========== */
-    .header {
-      display: grid;
-      grid-template-columns: auto 1fr auto auto;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-    }
-
-    .header-title {
-      font-size: clamp(1.4rem, 2.5vw, 2rem);
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-    }
-
-    .header-network-info {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      min-width: 0;
-    }
-
-    #network-subtitle {
-      color: var(--text);
-      font-weight: 700;
-      font-size: 0.95rem;
-      padding: 0.4rem 0.8rem;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      word-break: break-all;
-      max-width: 200px;
-    }
-
-    .btn-switch-network {
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .header-time {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      color: var(--text-light);
-      font-size: 0.95rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    /* ========== 按钮样式 ========== */
-    .btn-xs {
-      padding: 0.35rem 0.9rem;
-      font-size: 0.82rem;
-      border-radius: 8px;
-      min-height: 32px;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .btn {
-      padding: 0.6rem 1.1rem;
-      border: 1px solid transparent;
-      border-radius: 10px;
-      font-weight: 800;
-      cursor: pointer;
-      font-size: 0.88rem;
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition), border-color var(--transition);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      min-height: 38px;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      white-space: nowrap;
-    }
-
-    .btn:focus-visible {
-      outline: none;
-      box-shadow: var(--ring);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12) inset;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: #fff;
-      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.28);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 26px rgba(102, 126, 234, 0.38);
-    }
-
-    .btn-outline {
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--dark);
-      border-color: var(--border);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      border-color: var(--primary);
-      color: var(--primary);
-      background: #fff;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-    }
-
-    /* ----- Error Msg ----- */
-    .error-msg {
-      display: none;
-      background: #fed7d7;
-      color: #c53030;
-      padding: 0.85rem 0.9rem;
-      border-radius: var(--radius-xs);
-      margin-bottom: 1rem;
-      border-left: 3px solid #c53030;
-      font-size: 0.9rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    /* ----- Overview Card ----- */
-    .overview-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 1.2rem;
-      margin-bottom: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .overview-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.85rem;
-    }
-
-    .overview-title {
-      font-size: 1.25rem;
-      font-weight: 900;
-      color: var(--dark);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      min-width: 0;
-    }
-
-    .net-tag {
-      font-size: 0.75rem;
-      padding: 0.25rem 0.65rem;
-      border-radius: 999px;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      max-width: 100%;
-    }
-
-    .tag-blue { background: #ebf4ff; color: #3182ce; }
-    .tag-gray { background: #edf2f7; color: #4a5568; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .tag-orange { background: #fff3cd; color: #856404; }
-
-    /* Routes */
-    .overview-details {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    .network-routes-container {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.8rem;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.85rem;
-      color: var(--dark);
-      max-height: 140px;
-      overflow-y: auto;
-      scrollbar-gutter: stable;
-    }
-
-    .route-item-inline {
-      padding: 0.4rem 0;
-      border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.8rem;
-    }
-    .route-item-inline:last-child { border-bottom: none; }
-
-    .route-target {
-      font-weight: 800;
-      color: var(--primary);
-      flex-shrink: 0;
-    }
-
-    .route-via {
-      color: var(--text-light);
-      font-size: 0.8rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex: 1;
-      text-align: right;
-    }
-
-    /* Stats */
-    .overview-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 0.8rem;
-      margin-top: 0.3rem;
-    }
-
-    .stat-inline {
-      text-align: center;
-      padding: 0.8rem 0.6rem;
-      border-radius: 10px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-    }
-
-    .stat-inline .num {
-      font-size: 1.5rem;
-      font-weight: 950;
-      margin-bottom: 0.3rem;
-      letter-spacing: 0.2px;
-    }
-
-    .stat-inline.success .num { color: var(--success); }
-    .stat-inline.warning .num { color: var(--warning); }
-    .stat-inline.danger  .num { color: var(--danger); }
-    .stat-label { font-size: 0.75rem; color: var(--text-light); font-weight: 700; }
-
-    /* ----- Section ----- */
-    .section { margin-bottom: 1.5rem; }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .section-title {
-      font-size: clamp(1rem, 2.2vw, 1.1rem);
-      color: var(--dark);
-      font-weight: 900;
-    }
-
-    .section-count { color: var(--text-light); font-size: 0.82rem; font-weight: 700; }
-
-    /* Filters */
-    .filter-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-    .filter-btn {
-      padding: 0.45rem 0.85rem;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-light);
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 900;
-      transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
-      min-height: 36px;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .filter-btn:focus-visible { outline: none; box-shadow: var(--ring); }
-    .filter-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
-    .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); transform: none; }
-
-    /* Members Grid */
-    .members-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1rem;
-    }
-
-    /* 空状态卡片：占据整行并居中 */
-    .members-grid .empty-state {
-      grid-column: 1 / -1; /* 铺满宽度 */
-      text-align: center;
-      padding: 3rem 1.5rem; /* 统一内边距 */
-      background: var(--surface-2);
-      border-radius: var(--radius-sm);
-      border: 1px dashed rgba(102, 126, 234, 0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      color: var(--text-light);
-      font-weight: 600;
-      font-size: 1rem;
-      opacity: 0.9;
-    }
-
-    .member-card {
-      background: var(--surface);
-      border-radius: var(--radius-sm);
-      padding: 1rem;
-      box-shadow: var(--shadow-sm);
-      border-top: 3px solid var(--primary);
-      transition: transform var(--transition), box-shadow var(--transition);
-      overflow: hidden;
-    }
-
-    .member-card.animate-in {
-      animation: fadeSlideIn 0.35s ease;
-    }
-    @keyframes fadeSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
-    .member-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
-
-    .member-card.pending {
-      border-top-color: var(--warning);
-      background: linear-gradient(135deg, #fffaf0 0%, #fff 100%);
-    }
-
-    .member-card.hidden { display: none !important; }
-
-    /* Member head */
-    .member-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-      padding-bottom: 0.7rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 0.7rem;
-    }
-
-    .member-name {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      /*flex-wrap: wrap;*/
-      font-size: 1rem;
-      font-weight: 950;
-      color: var(--dark);
-    }
-
-    /* 新增：专门控制名称文本的省略 */
-    .name-text {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex-shrink: 1; /* 允许名称被压缩 */
-      min-width: 0;   /* 关键：防止 Flex 子项撑破容器 */
-    }
-
-    .status-badge {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-    .status-badge.online { background: var(--success); }
-    .status-badge.offline { background: #cbd5e0; }
-
-    .status-text {
-      flex-shrink: 0; /* 新增：防止状态标签（在线/离线）被长名字挤压变形 */
-      font-size: 0.76rem;
-      color: var(--text-light);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-weight: 800;
-    }
-    .status-text.blue { color: #3182ce; }
-
-    /* Member menu */
-    .member-menu { position: relative; flex-shrink: 0; }
-
-    .menu-trigger {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 950;
-      font-size: 16px;
-      line-height: 1;
-      color: var(--text-light);
-      transition: transform var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .menu-trigger:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .menu-trigger:focus-visible { outline: none; box-shadow: var(--ring); }
-
-    .menu-panel {
-      position: absolute;
-      top: 38px;
-      right: 0;
-      width: 160px;
-      max-width: min(180px, 80vw);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-      z-index: 50;
-      opacity: 0;
-      transform: translateY(-6px);
-      pointer-events: none;
-      transition: opacity var(--transition), transform var(--transition);
-    }
-
-    .member-menu.open .menu-panel {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .menu-item {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      text-align: left;
-      font-size: 0.84rem;
-      font-weight: 950;
-      color: var(--dark);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      min-height: 38px;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .menu-item:hover { background: var(--surface-2); }
-    .menu-item:focus-visible { outline: none; box-shadow: inset var(--ring); }
-    .menu-item.danger { color: #e53e3e; }
-    .menu-sep { height: 1px; background: var(--border); }
-
-    /* Member info */
-    .member-info-item {
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      gap: 0.45rem;
-      font-size: 0.86rem;
-      align-items: center;
-      padding: 0.15rem 0;
-    }
-
-    .info-label {
-      color: var(--text-light);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      font-weight: 900;
-      white-space: nowrap;
-      opacity: 0.92;
-    }
-
-    .info-value { color: var(--dark); min-width: 0; }
-    .member-info-item .info-value {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .member-info-item .info-value.ellipsis {
-      display: block;
-      max-width: 100%;
-    }
-
-    /* Member action buttons (if used elsewhere) */
-    .member-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.8rem;
-      padding-top: 0.8rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .btn-action {
-      flex: 1;
-      padding: 0.45rem 0.55rem;
-      border: 1px solid transparent;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 950;
-      font-size: 0.78rem;
-      transition: transform var(--transition), filter var(--transition), box-shadow var(--transition);
-      min-height: 36px;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .btn-action:focus-visible { outline: none; box-shadow: var(--ring); }
-    .btn-action:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-    .btn-action:active { transform: translateY(0); }
-
-    .btn-secondary { background: #edf2f7; color: var(--dark); }
-    .btn-danger { background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%); color: #fff; }
-    .btn-success { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: #fff; }
-
-    /* Pending table */
-    .pending-table {
-      background: var(--surface);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-    }
-
-    .pending-table-header,
-    .pending-table-row {
-      display: grid;
-      gap: 0.5rem;
-      align-items: center;
-      padding: 0.8rem 1rem;
-      font-size: 0.86rem;
-      grid-template-columns:
-        minmax(120px, 1.2fr)
-        minmax(92px, 0.8fr)
-        minmax(160px, 1.6fr)
-        minmax(78px, 0.7fr)
-        minmax(130px, 1.2fr)
-        minmax(72px, 0.6fr)
-        minmax(130px, 0.9fr);
-      min-width: 0;
-    }
-
-    .pending-table-header {
-      background: var(--surface-2);
-      color: var(--text-light);
-      font-weight: 950;
-    }
-
-    .pending-table-row {
-      border-top: 1px solid var(--border);
-      transition: background var(--transition);
-    }
-
-    .pending-table-row:hover { background: var(--surface-2); }
-
-    .pending-table-cell.primary {
-      font-weight: 950;
-      color: var(--dark);
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .pending-table-cell {
-      grid-template-columns: max-content 1fr;
-      align-items: center;
-      column-gap: 0.6rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
-    }
-
-    .pending-table-cell[data-label="备注"],
-    .pending-table-cell[data-label="公网"] {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
-    }
-
-    .pending-table-actions {
-      display: flex;
-      gap: 0.45rem;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-    }
-
-    /* Empty state */
-    .empty-state {
-      grid-column: 1 / -1; /* 铺满宽度 */
-      text-align: center;
-      padding: 3rem 1.5rem;
-      background: var(--surface-2) !important; /* 🔥 强制使用淡灰背景，防止被白色覆盖 */
-      border-radius: var(--radius-sm);
-      border: 1px dashed rgba(102, 126, 234, 0.2) !important; /* 🔥 强制使用虚线边框 */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      color: var(--text-light);
-      font-weight: 600;
-      font-size: 1rem;
-      opacity: 0.9; /* 统一透明度 */
-      margin: 0; /* 重置外边距 */
-    }
-    .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.55; }
-    .empty-text { color: var(--text-light); font-size: 0.92rem; font-weight: 800; }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      background: rgba(0, 0, 0, 0.86);
-      color: #fff;
-      padding: 0.8rem 1.15rem;
-      border-radius: 12px;
-      opacity: 0;
-      transition: opacity 220ms ease;
-      pointer-events: none;
-      z-index: 1000;
-      font-size: 0.92rem;
-      box-shadow: var(--shadow-md);
-      max-width: min(360px, calc(100vw - 2rem));
-      word-break: break-word;
-    }
-    .toast.show { opacity: 1; pointer-events: auto; }
-
-    /* ========== 响应式布局 ========== */
-    @media (max-width: 1280px) {
-      .header {
-        grid-template-columns: auto 1fr auto auto;
-        gap: 1rem;
-      }
-      .header-network-info {
-        gap: 0.6rem;
-      }
-    }
-
-    @media (max-width: 896px) {
-      .header {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-        border-bottom: none;
-        padding-bottom: 0;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .header-title {
-        grid-column: 1;
-      }
-
-      .header-network-info {
-        display: flex !important;
-        justify-content: center !important; /* 🔥 水平居中 */
-        align-items: center !important;     /* 🔥 垂直居中 */
-        width: 100% !important;             /* 保持占满宽度 */
-        gap: 0.6rem !important;             /* 保持间距 */
-        min-width: 0 !important;            /* 防止溢出 */
-      }
-
-      #network-subtitle {
-        flex: 1 1 auto !important; /* 允许伸缩 */
-        min-width: 0 !important;   /* 🔥 关键：允许宽度小于内容宽度 */
-        word-break: break-all !important; /* 🔥 关键：强制长字符换行 */
-        text-align: center;
-        margin: 0;
-      }
-
-
-      .header-time {
-        grid-column: 1;
-      }
-
-      .header-actions {
-        grid-column: 1;
-        width: 100%;
-      }
-
-      .header-actions .btn {
-        flex: 1;
-      }
-    }
-
-    /* ========== 移动端优化 768px 以下 ========== */
-    @media (max-width: 640px) {
-      body {
-        background-image: none;
-      }
-
-      .container {
-        padding: 0.8rem;
-      }
-
-      .header {
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .header-title {
-        font-size: 1.25rem;
-        margin-bottom: 0.2rem;
-      }
-
-      /* 网络信息段 */
-      .header-network-info {
-        width: 100%;
-        gap: 0.6rem;
-        display: flex;
-        align-items: center;
-      }
-
-      #network-subtitle {
-        font-size: 0.9rem;
-        padding: 0.35rem 0.6rem;
-        border-radius: 6px;
-        min-height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .btn-switch-network {
-        padding: 0.35rem 0.75rem;
-        font-size: 0.78rem;
-        min-height: 36px;
-      }
-
-      /* 时间段 */
-      .header-time {
-        font-size: 0.88rem;
-        color: var(--text-light);
-        order: 3;
-      }
-
-      /* 操作按钮段 */
-      .header-actions {
-        flex-direction: row;
-        width: 100%;
-        gap: 0.5rem;
-        order: 4;
-      }
-
-      .header-actions .btn {
-        flex: 1;
-        padding: 0.4rem 0.6rem;
-        font-size: 0.75rem;
-        min-height: 36px;
-        gap: 0.3rem;
-      }
-
-      /* 压缩图标 */
-      .header-actions .btn::before {
-        content: attr(data-icon);
-      }
-
-      /* 概览卡 */
-      .overview-card {
-        padding: 1rem;
-        margin-bottom: 1rem;
-      }
-
-      .overview-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.6rem;
-      }
-
-      .stat-inline {
-        padding: 0.6rem 0.4rem;
-      }
-
-      .stat-inline .num {
-        font-size: 1.2rem;
-      }
-
-      .stat-label {
-        font-size: 0.7rem;
-      }
-
-      /* 成员卡 */
-      .members-grid {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-      }
-
-      .member-card {
-        padding: 0.8rem;
-      }
-
-      .member-head {
-        gap: 0.4rem;
-        margin-bottom: 0.5rem;
-        padding-bottom: 0.5rem;
-      }
-
-      .member-name {
-        font-size: 0.95rem;
-      }
-
-      .member-info-item {
-        gap: 0.35rem;
-        font-size: 0.82rem;
-        padding: 0.1rem 0;
-      }
-
-      .info-label {
-        font-size: 0.7rem;
-        opacity: 0.85;
-      }
-
-      .info-value {
-        font-size: 0.82rem;
-      }
-
-      /* 段落标题 */
-      .section-header {
-        gap: 0.8rem;
-      }
-
-      .section-title {
-        font-size: 1rem;
-      }
-
-      .filter-btn {
-        font-size: 0.75rem;
-        padding: 0.35rem 0.65rem;
-        min-height: 32px;
-      }
-
-      /* 路由 */
-      .route-item-inline {
-        padding: 0.35rem 0;
-        gap: 0.6rem;
-      }
-
-      .route-target {
-        font-size: 0.8rem;
-      }
-
-      .route-via {
-        font-size: 0.75rem;
-      }
-
-      /* 待授权表格 */
-      .pending-table-row {
-        gap: 0.4rem;
-        padding: 0.6rem 0.8rem;
-      }
-
-      .btn-action {
-        padding: 0.4rem 0.5rem;
-        font-size: 0.73rem;
-        min-height: 32px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 0.6rem;
-      }
-
-      .header-title {
-        font-size: 1.15rem;
-      }
-
-      #network-subtitle {
-        font-size: 0.85rem;
-        padding: 0.3rem 0.5rem;
-      }
-
-      .btn-switch-network {
-        padding: 0.3rem 0.65rem;
-        font-size: 0.72rem;
-        min-height: 34px;
-      }
-
-      .header-actions .btn {
-        padding: 0.35rem 0.5rem;
-        font-size: 0.7rem;
-        min-height: 34px;
-      }
-
-      .overview-card {
-        padding: 0.8rem;
-      }
-
-      .stat-inline {
-        padding: 0.5rem 0.3rem;
-      }
-
-      .stat-inline .num {
-        font-size: 1.1rem;
-      }
-
-      .member-card {
-        padding: 0.7rem;
-      }
-
-      .member-name {
-        font-size: 0.9rem;
-      }
-
-      .info-label {
-        font-size: 0.65rem;
-      }
-
-      .info-value {
-        font-size: 0.8rem;
-      }
-
-      .section-title {
-        font-size: 0.95rem;
-      }
-
-      .overview-top {
-        padding-bottom: 0.6rem;
-      }
-
-      .network-routes-container {
-        font-size: 0.8rem;
-        padding: 0.6rem;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .container {
-        padding: 0.5rem;
-      }
-
-      .header-title {
-        font-size: 1.1rem;
-        margin-bottom: 0.15rem;
-      }
-
-      .header-network-info {
-        gap: 0.4rem;
-      }
-
-      #network-subtitle {
-        font-size: 0.8rem;
-        padding: 0.25rem 0.4rem;
-
-      }
-
-      .btn-switch-network {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.68rem;
-        min-height: 32px;
-      }
-
-      .header-time {
-        font-size: 0.82rem;
-      }
-
-      .header-actions .btn {
-        padding: 0.3rem 0.4rem;
-        font-size: 0.65rem;
-        min-height: 32px;
-      }
-
-      .overview-card {
-        padding: 0.7rem;
-        margin-bottom: 0.8rem;
-      }
-
-      .stat-inline {
-        padding: 0.4rem 0.2rem;
-        border-radius: 8px;
-      }
-
-      .stat-inline .num {
-        font-size: 1rem;
-        margin-bottom: 0.15rem;
-      }
-
-      .stat-label {
-        font-size: 0.65rem;
-      }
-
-      .member-card {
-        padding: 0.6rem;
-      }
-
-      .member-head {
-        gap: 0.3rem;
-        padding-bottom: 0.4rem;
-        margin-bottom: 0.4rem;
-      }
-
-      .member-name {
-        font-size: 0.88rem;
-        gap: 0.3rem;
-      }
-
-      .member-info-item {
-        gap: 0.3rem;
-        font-size: 0.78rem;
-        padding: 0.08rem 0;
-      }
-
-      .info-label {
-        font-size: 0.62rem;
-      }
-
-      .info-value {
-        font-size: 0.78rem;
-      }
-
-      .section-title {
-        font-size: 0.9rem;
-      }
-
-      .filter-btn {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.5rem;
-        min-height: 30px;
-      }
-
-      .menu-trigger {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-      }
-
-      .route-item-inline {
-        padding: 0.3rem 0;
-        gap: 0.4rem;
-      }
-
-      .btn-action {
-        padding: 0.35rem 0.4rem;
-        font-size: 0.68rem;
-        min-height: 30px;
-      }
-    }
-
-    /* Optional: Dark mode */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0b1220;
-        --surface: #0f172a;
-        --surface-2: #111c35;
-        --border: rgba(148, 163, 184, 0.22);
-        --dark: #e5e7eb;
-        --text: #e5e7eb;
-        --text-light: rgba(226, 232, 240, 0.7);
-        --shadow-sm: 0 2px 10px rgba(0,0,0,.35);
-        --shadow-md: 0 14px 34px rgba(0,0,0,.42);
-      }
-
-      body { color: var(--text); }
-      .btn-outline { background: rgba(15, 23, 42, 0.72); color: var(--text); }
-      .menu-panel, .overview-card, .member-card, .pending-table { background: var(--surface); }
-      .pending-table-header, .stat-inline, .network-routes-container { background: var(--surface-2); }
-      .toast { background: rgba(0,0,0,0.78); }
-      .tag-gray { background: rgba(148,163,184,0.12); color: rgba(226,232,240,0.8); }
-    }
-
-    .edit-mask {
-      position: fixed;
-      z-index: 9999;
-      inset: 0;
-      background: rgba(30,32,42,0.32);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .edit-panel {
-      background: var(--surface, #fff);
-      border-radius: 16px;
-      box-shadow: 0 12px 48px 0 rgba(20, 34, 68, 0.13);
-      padding: 2rem 2rem 1.2rem 2rem;
-      min-width: 290px;
-      width: 100%;
-      max-width: 380px;
-      animation: slideInPanel .25s;
-      position: relative;
-    }
-    @keyframes slideInPanel {
-      0% { transform: translateY(48px); opacity: 0; }
-      100% { transform: none; opacity: 1; }
-    }
-    .edit-panel-title {
-      margin: 0 0 1.2rem 0;
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: var(--primary, #667eea);
-      text-align: center;
-    }
-    .edit-form-group {
-      margin-bottom: 1.15rem;
-    }
-    .edit-form-group label {
-      display: block;
-      margin-bottom: 0.4rem;
-      font-weight: 600;
-      color: #334155;
-      font-size: 0.95rem;
-    }
-    .edit-form-group input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1.5px solid var(--border, #e2e8f0);
-      border-radius: 8px;
-      font-size: 1rem;
-      background: var(--surface-2, #f7fafc);
-      transition: border 0.25s;
-      outline: none;
-    }
-    .edit-form-group input:focus {
-      border-color: var(--primary, #667eea);
-      background: #fff;
-    }
-    .edit-form-group input[readonly] {
-      background: #f1f5f9;
-      color: #aaa;
-    }
-
-    .edit-form-action {
-      display: flex;
-      gap: 0.9rem;
-      justify-content: flex-end;
-      margin-top: 1.3rem;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      border: 2px solid #fff;
-      border-top: 2px solid var(--primary, #667eea);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: -0.15em;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    @media (max-width:600px) {
-      .edit-panel {
-        min-width: 0;
-        padding: 1.2rem 0.8rem 0.8rem 0.8rem;
-        border-radius: 11px;
-        max-width: 99vw;
-      }
-      .edit-panel-title {
-        font-size: 1.05rem;
-      }
-      .edit-form-group input {
-        padding: 0.6rem 0.7rem;
-        font-size: 1rem;
-      }
-      .edit-form-action {
-        gap: 0.6rem;
-      }
-    }
-    #pending-section {
-      margin-top: 1.2rem;
-      padding-top: 0.8rem;
-      border-top: 1px solid var(--border);
-    }
-    /* ===== Footer ===== */
-    .app-footer {
-      margin-top: 2rem;
-      padding: 1.2rem 1rem;
-      border-top: 1px solid var(--border);
-      opacity: 0;
-      transform: translateY(8px);
-      animation: footerFadeIn 0.6s ease forwards;
-    }
-
-    /* 淡入动画 */
-    @keyframes footerFadeIn {
-      to {
-        opacity: 0.75;
-        transform: none;
-      }
-    }
-
-    .app-footer:hover {
-      opacity: 1;
-    }
-
-    /* 布局 */
-    .footer-inner {
-      max-width: var(--container);
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.8rem;
-      flex-wrap: wrap;
-    }
-
-    /* 左侧 */
-    .footer-left {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-      color: var(--text-light);
-      font-weight: 700;
-    }
-
-    .footer-title {
-      color: var(--text);
-      font-weight: 900;
-    }
-
-    .footer-divider {
-      opacity: 0.5;
-    }
-
-    .footer-license {
-      opacity: 0.85;
-    }
-
-    /* 右侧 */
-    .footer-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--text-light);
-      text-decoration: none;
-      padding: 0.4rem 0.7rem;
-      border-radius: 8px;
-      transition: all 0.15s ease;
-    }
-
-    .footer-link:hover {
-      color: var(--primary);
-      background: var(--surface-2);
-      transform: translateY(-1px);
-    }
-
-    /* GitHub SVG */
-    .footer-icon svg {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.2s ease;
-    }
-
-    .footer-link:hover .footer-icon svg {
-      transform: scale(1.15);
-    }
-
-    /* ===== 响应式 ===== */
-    @media (max-width: 640px) {
-      .app-footer {
-        padding: 1rem 0.6rem;
-      }
-
-      .footer-inner {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 0.5rem;
-      }
-
-      .footer-left {
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      .footer-link {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="32x32">
+    <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="192x192">
+    <title>ZTPanel</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --warning: #f6ad55;
+            --danger: #f56565;
+            --dark: #2d3748;
+            --text: #1f2937;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --bg: #f5f7fa;
+            --surface: #ffffff;
+            --surface-2: #f7fafc;
+            --radius: 12px;
+            --radius-sm: 10px;
+            --radius-xs: 8px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.12);
+            --ring: 0 0 0 3px rgba(102, 126, 234, 0.22);
+            --transition: 150ms ease;
+            --container: 1200px;
+            --bg-img: url("https://www.zerotier.com/wp-content/uploads/2026/04/Globe-260323v01-DRAFT.png");
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body, h1, h2, h3, p {
+            margin: 0;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+            Arial, "Noto Sans", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            background-image: var(--bg-img);
+            background-repeat: no-repeat;
+            background-size: 680px auto;
+            background-position: right 22% top 55%;
+            background-attachment: fixed;
+            line-height: 1.45;
+        }
+
+        .container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 1.5rem;
+            padding-left: max(1rem, env(safe-area-inset-left));
+            padding-right: max(1rem, env(safe-area-inset-right));
+            padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+        }
+
+        /* ========== 头部布局 ========== */
+        .header {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .header-title {
+            font-size: clamp(1.4rem, 2.5vw, 2rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+
+        .header-network-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            min-width: 0;
+        }
+
+        #network-subtitle {
+            color: var(--text);
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.4rem 0.8rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            word-break: break-all;
+            max-width: 200px;
+        }
+
+        .btn-switch-network {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .header-time {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* ========== 按钮样式 ========== */
+        .btn-xs {
+            padding: 0.35rem 0.9rem;
+            font-size: 0.82rem;
+            border-radius: 8px;
+            min-height: 32px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .btn {
+            padding: 0.6rem 1.1rem;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.88rem;
+            transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition), border-color var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            min-height: 38px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .btn:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) inset;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.28);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px rgba(102, 126, 234, 0.38);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark);
+            border-color: var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        /* ----- Error Msg ----- */
+        .error-msg {
+            display: none;
+            background: #fed7d7;
+            color: #c53030;
+            padding: 0.85rem 0.9rem;
+            border-radius: var(--radius-xs);
+            margin-bottom: 1rem;
+            border-left: 3px solid #c53030;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ----- Overview Card ----- */
+        .overview-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .overview-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.85rem;
+        }
+
+        .overview-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        .net-tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            max-width: 100%;
+        }
+
+        .tag-blue {
+            background: #ebf4ff;
+            color: #3182ce;
+        }
+
+        .tag-gray {
+            background: #edf2f7;
+            color: #4a5568;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tag-orange {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Routes */
+        .overview-details {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .network-routes-container {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.8rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.85rem;
+            color: var(--dark);
+            max-height: 140px;
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+        }
+
+        .route-item-inline {
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .route-item-inline:last-child {
+            border-bottom: none;
+        }
+
+        .route-target {
+            font-weight: 800;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .route-via {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            text-align: right;
+        }
+
+        /* Stats */
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .stat-inline {
+            text-align: center;
+            padding: 0.8rem 0.6rem;
+            border-radius: 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+        }
+
+        .stat-inline .num {
+            font-size: 1.5rem;
+            font-weight: 950;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.2px;
+        }
+
+        .stat-inline.success .num {
+            color: var(--success);
+        }
+
+        .stat-inline.warning .num {
+            color: var(--warning);
+        }
+
+        .stat-inline.danger .num {
+            color: var(--danger);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        /* ----- Section ----- */
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(1rem, 2.2vw, 1.1rem);
+            color: var(--dark);
+            font-weight: 900;
+        }
+
+        .section-count {
+            color: var(--text-light);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        /* Filters */
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.45rem 0.85rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-light);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 900;
+            transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
+            min-height: 36px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .filter-btn:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: none;
+        }
+
+        /* Members Grid */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+
+        /* 空状态卡片：占据整行并居中 */
+        .members-grid .empty-state {
+            grid-column: 1 / -1; /* 铺满宽度 */
+            text-align: center;
+            padding: 3rem 1.5rem; /* 统一内边距 */
+            background: var(--surface-2);
+            border-radius: var(--radius-sm);
+            border: 1px dashed rgba(102, 126, 234, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .member-card {
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            border-top: 3px solid var(--primary);
+            transition: transform var(--transition), box-shadow var(--transition);
+            overflow: hidden;
+        }
+
+        .member-card.animate-in {
+            animation: fadeSlideIn 0.35s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .member-card.pending {
+            border-top-color: var(--warning);
+            background: linear-gradient(135deg, #fffaf0 0%, #fff 100%);
+        }
+
+        .member-card.hidden {
+            display: none !important;
+        }
+
+        /* Member head */
+        .member-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding-bottom: 0.7rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0.7rem;
+        }
+
+        .member-name {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            /*flex-wrap: wrap;*/
+            font-size: 1rem;
+            font-weight: 950;
+            color: var(--dark);
+        }
+
+        /* 新增：专门控制名称文本的省略 */
+        .name-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 1; /* 允许名称被压缩 */
+            min-width: 0; /* 关键：防止 Flex 子项撑破容器 */
+        }
+
+        .status-badge {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .status-badge.online {
+            background: var(--success);
+        }
+
+        .status-badge.offline {
+            background: #cbd5e0;
+        }
+
+        .status-text {
+            flex-shrink: 0; /* 新增：防止状态标签（在线/离线）被长名字挤压变形 */
+            font-size: 0.76rem;
+            color: var(--text-light);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-weight: 800;
+        }
+
+        .status-text.blue {
+            color: #3182ce;
+        }
+
+        /* Member menu */
+        .member-menu {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .menu-trigger {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 950;
+            font-size: 16px;
+            line-height: 1;
+            color: var(--text-light);
+            transition: transform var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .menu-trigger:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .menu-trigger:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        .menu-panel {
+            position: absolute;
+            top: 38px;
+            right: 0;
+            width: 160px;
+            max-width: min(180px, 80vw);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            z-index: 50;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity var(--transition), transform var(--transition);
+        }
+
+        .member-menu.open .menu-panel {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .menu-item {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.84rem;
+            font-weight: 950;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 38px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .menu-item:hover {
+            background: var(--surface-2);
+        }
+
+        .menu-item:focus-visible {
+            outline: none;
+            box-shadow: inset var(--ring);
+        }
+
+        .menu-item.danger {
+            color: #e53e3e;
+        }
+
+        .menu-sep {
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Member info */
+        .member-info-item {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 0.45rem;
+            font-size: 0.86rem;
+            align-items: center;
+            padding: 0.15rem 0;
+        }
+
+        .info-label {
+            color: var(--text-light);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            white-space: nowrap;
+            opacity: 0.92;
+        }
+
+        .info-value {
+            color: var(--dark);
+            min-width: 0;
+        }
+
+        .member-info-item .info-value {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .member-info-item .info-value.ellipsis {
+            display: block;
+            max-width: 100%;
+        }
+
+        /* Member action buttons (if used elsewhere) */
+        .member-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 0.45rem 0.55rem;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 950;
+            font-size: 0.78rem;
+            transition: transform var(--transition), filter var(--transition), box-shadow var(--transition);
+            min-height: 36px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-action:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: var(--dark);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #fff;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #fff;
+        }
+
+        /* Pending table */
+        .pending-table {
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .pending-table-header,
+        .pending-table-row {
+            display: grid;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            font-size: 0.86rem;
+            grid-template-columns:
+        minmax(75px,  0.8fr)  /* 名称列 */
+    minmax(65px,  0.6fr)  /* 标识列 */
+    minmax(100px,  1.0fr)  /* 备注列 */
+    minmax(75px,  0.8fr)  /* 内网列 */
+    minmax(75px,  0.8fr)  /* 公网列 */
+    minmax(50px,  0.5fr)  /* 版本列 */
+    minmax(80px, 0.8fr); /* 操作列 */
+            min-width: 0;
+        }
+
+        .pending-table-header {
+            background: var(--surface-2);
+            color: var(--text-light);
+            font-weight: 950;
+        }
+
+        .pending-table-row {
+            border-top: 1px solid var(--border);
+            transition: background var(--transition);
+        }
+
+        .pending-table-row:hover {
+            background: var(--surface-2);
+        }
+
+        .pending-table-cell.primary {
+            font-weight: 950;
+            color: var(--dark);
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pending-table-cell {
+            grid-template-columns: max-content 1fr;
+            align-items: center;
+            column-gap: 0.6rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .pending-table-cell[data-label="备注"],
+        .pending-table-cell[data-label="公网"] {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .pending-table-actions {
+            display: flex;
+            gap: 0.45rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        /* Empty state */
+        .empty-state {
+            grid-column: 1 / -1; /* 铺满宽度 */
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background: var(--surface-2) !important; /* 🔥 强制使用淡灰背景，防止被白色覆盖 */
+            border-radius: var(--radius-sm);
+            border: 1px dashed rgba(102, 126, 234, 0.2) !important; /* 🔥 强制使用虚线边框 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1rem;
+            opacity: 0.9; /* 统一透明度 */
+            margin: 0; /* 重置外边距 */
+        }
+
+        .empty-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.55;
+        }
+
+        .empty-text {
+            color: var(--text-light);
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: rgba(0, 0, 0, 0.86);
+            color: #fff;
+            padding: 0.8rem 1.15rem;
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 220ms ease;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 0.92rem;
+            box-shadow: var(--shadow-md);
+            max-width: min(360px, calc(100vw - 2rem));
+            word-break: break-word;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ========== 响应式布局 ========== */
+        @media (max-width: 1280px) {
+            .header {
+                grid-template-columns: auto 1fr auto auto;
+                gap: 1rem;
+            }
+
+            .header-network-info {
+                gap: 0.6rem;
+            }
+        }
+
+        @media (max-width: 896px) {
+            .header {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+                border-bottom: none;
+                padding-bottom: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .header-title {
+                grid-column: 1;
+            }
+
+            .header-network-info {
+                display: flex !important;
+                justify-content: center !important; /* 🔥 水平居中 */
+                align-items: center !important; /* 🔥 垂直居中 */
+                width: 100% !important; /* 保持占满宽度 */
+                gap: 0.6rem !important; /* 保持间距 */
+                min-width: 0 !important; /* 防止溢出 */
+            }
+
+            #network-subtitle {
+                flex: 1 1 auto !important; /* 允许伸缩 */
+                min-width: 0 !important; /* 🔥 关键：允许宽度小于内容宽度 */
+                word-break: break-all !important; /* 🔥 关键：强制长字符换行 */
+                text-align: center;
+                margin: 0;
+            }
+
+
+            .header-time {
+                grid-column: 1;
+            }
+
+            .header-actions {
+                grid-column: 1;
+                width: 100%;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+            }
+
+            .pending-table-header {
+                display: none;
+            }
+
+            .pending-table-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .pending-table-cell::before {
+                content: attr(data-label);
+                color: var(--text-light);
+                font-size: 0.75rem;
+                white-space: nowrap;
+                font-weight: 900;
+                opacity: 0.95;
+            }
+
+            .pending-table-actions {
+                justify-content: flex-start;
+                margin-top: 0.2rem;
+            }
+        }
+
+
+        /* ========== 移动端优化 768px 以下 ========== */
+        @media (max-width: 640px) {
+            body {
+                background-image: none;
+            }
+
+            .container {
+                padding: 0.8rem;
+            }
+
+            .header {
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .header-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.2rem;
+            }
+
+            /* 网络信息段 */
+            .header-network-info {
+                width: 100%;
+                gap: 0.6rem;
+                display: flex;
+                align-items: center;
+            }
+
+            #network-subtitle {
+                font-size: 0.9rem;
+                padding: 0.35rem 0.6rem;
+                border-radius: 6px;
+                min-height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .btn-switch-network {
+                padding: 0.35rem 0.75rem;
+                font-size: 0.78rem;
+                min-height: 36px;
+            }
+
+            /* 时间段 */
+            .header-time {
+                font-size: 0.88rem;
+                color: var(--text-light);
+                order: 3;
+            }
+
+            /* 操作按钮段 */
+            .header-actions {
+                flex-direction: row;
+                width: 100%;
+                gap: 0.5rem;
+                order: 4;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+                padding: 0.4rem 0.6rem;
+                font-size: 0.75rem;
+                min-height: 36px;
+                gap: 0.3rem;
+            }
+
+            /* 压缩图标 */
+            .header-actions .btn::before {
+                content: attr(data-icon);
+            }
+
+            /* 概览卡 */
+            .overview-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .overview-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.6rem;
+            }
+
+            .stat-inline {
+                padding: 0.6rem 0.4rem;
+            }
+
+            .stat-inline .num {
+                font-size: 1.2rem;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
+            }
+
+            /* 成员卡 */
+            .members-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .member-card {
+                padding: 0.8rem;
+            }
+
+            .member-head {
+                gap: 0.4rem;
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            .member-name {
+                font-size: 0.95rem;
+            }
+
+            .member-info-item {
+                gap: 0.35rem;
+                font-size: 0.82rem;
+                padding: 0.1rem 0;
+            }
+
+            .info-label {
+                font-size: 0.7rem;
+                opacity: 0.85;
+            }
+
+            .info-value {
+                font-size: 0.82rem;
+            }
+
+            /* 段落标题 */
+            .section-header {
+                gap: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 1rem;
+            }
+
+            .filter-btn {
+                font-size: 0.75rem;
+                padding: 0.35rem 0.65rem;
+                min-height: 32px;
+            }
+
+            /* 路由 */
+            .route-item-inline {
+                padding: 0.35rem 0;
+                gap: 0.6rem;
+            }
+
+            .route-target {
+                font-size: 0.8rem;
+            }
+
+            .route-via {
+                font-size: 0.75rem;
+            }
+
+            /* 待授权表格 */
+            .pending-table-row {
+                grid-template-columns: 1fr;
+                gap: 0.4rem;
+                padding: 0.6rem 0.8rem;
+            }
+
+            .btn-action {
+                padding: 0.4rem 0.5rem;
+                font-size: 0.73rem;
+                min-height: 32px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.6rem;
+            }
+
+            .header-title {
+                font-size: 1.15rem;
+            }
+
+            #network-subtitle {
+                font-size: 0.85rem;
+                padding: 0.3rem 0.5rem;
+            }
+
+            .btn-switch-network {
+                padding: 0.3rem 0.65rem;
+                font-size: 0.72rem;
+                min-height: 34px;
+            }
+
+            .header-actions .btn {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.7rem;
+                min-height: 34px;
+            }
+
+            .overview-card {
+                padding: 0.8rem;
+            }
+
+            .stat-inline {
+                padding: 0.5rem 0.3rem;
+            }
+
+            .stat-inline .num {
+                font-size: 1.1rem;
+            }
+
+            .member-card {
+                padding: 0.7rem;
+            }
+
+            .member-name {
+                font-size: 0.9rem;
+            }
+
+            .info-label {
+                font-size: 0.65rem;
+            }
+
+            .info-value {
+                font-size: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 0.95rem;
+            }
+
+            .overview-top {
+                padding-bottom: 0.6rem;
+            }
+
+            .network-routes-container {
+                font-size: 0.8rem;
+                padding: 0.6rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .header-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.15rem;
+            }
+
+            .header-network-info {
+                gap: 0.4rem;
+            }
+
+            #network-subtitle {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.4rem;
+
+            }
+
+            .btn-switch-network {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.68rem;
+                min-height: 32px;
+            }
+
+            .header-time {
+                font-size: 0.82rem;
+            }
+
+            .header-actions .btn {
+                padding: 0.3rem 0.4rem;
+                font-size: 0.65rem;
+                min-height: 32px;
+            }
+
+            .overview-card {
+                padding: 0.7rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .stat-inline {
+                padding: 0.4rem 0.2rem;
+                border-radius: 8px;
+            }
+
+            .stat-inline .num {
+                font-size: 1rem;
+                margin-bottom: 0.15rem;
+            }
+
+            .stat-label {
+                font-size: 0.65rem;
+            }
+
+            .member-card {
+                padding: 0.6rem;
+            }
+
+            .member-head {
+                gap: 0.3rem;
+                padding-bottom: 0.4rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .member-name {
+                font-size: 0.88rem;
+                gap: 0.3rem;
+            }
+
+            .member-info-item {
+                gap: 0.3rem;
+                font-size: 0.78rem;
+                padding: 0.08rem 0;
+            }
+
+            .info-label {
+                font-size: 0.62rem;
+            }
+
+            .info-value {
+                font-size: 0.78rem;
+            }
+
+            .section-title {
+                font-size: 0.9rem;
+            }
+
+            .filter-btn {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.5rem;
+                min-height: 30px;
+            }
+
+            .menu-trigger {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .route-item-inline {
+                padding: 0.3rem 0;
+                gap: 0.4rem;
+            }
+
+            .btn-action {
+                padding: 0.35rem 0.4rem;
+                font-size: 0.68rem;
+                min-height: 30px;
+            }
+        }
+
+        /* Optional: Dark mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0b1220;
+                --surface: #0f172a;
+                --surface-2: #111c35;
+                --border: rgba(148, 163, 184, 0.22);
+                --dark: #e5e7eb;
+                --text: #e5e7eb;
+                --text-light: rgba(226, 232, 240, 0.7);
+                --shadow-sm: 0 2px 10px rgba(0, 0, 0, .35);
+                --shadow-md: 0 14px 34px rgba(0, 0, 0, .42);
+            }
+
+            body {
+                color: var(--text);
+            }
+
+            .btn-outline {
+                background: rgba(15, 23, 42, 0.72);
+                color: var(--text);
+            }
+
+            .menu-panel, .overview-card, .member-card, .pending-table {
+                background: var(--surface);
+            }
+
+            .pending-table-header, .stat-inline, .network-routes-container {
+                background: var(--surface-2);
+            }
+
+            .toast {
+                background: rgba(0, 0, 0, 0.78);
+            }
+
+            .tag-gray {
+                background: rgba(148, 163, 184, 0.12);
+                color: rgba(226, 232, 240, 0.8);
+            }
+        }
+
+        .edit-mask {
+            position: fixed;
+            z-index: 9999;
+            inset: 0;
+            background: rgba(30, 32, 42, 0.32);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overscroll-behavior: contain;
+        }
+
+        .edit-panel {
+            background: var(--surface, #fff);
+            border-radius: 16px;
+            box-shadow: 0 12px 48px 0 rgba(20, 34, 68, 0.13);
+            padding: 2rem 2rem 1.2rem 2rem;
+            min-width: 290px;
+            width: 100%;
+            max-width: 380px;
+            animation: slideInPanel .25s;
+            position: relative;
+        }
+
+        @keyframes slideInPanel {
+            0% {
+                transform: translateY(48px);
+                opacity: 0;
+            }
+            100% {
+                transform: none;
+                opacity: 1;
+            }
+        }
+
+        .edit-panel-title {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary, #667eea);
+            text-align: center;
+        }
+
+        .edit-panel-nodeId {
+            margin: 0 0 1.2rem 0;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--text-light, #667eea);
+            text-align: center;
+        }
+
+        .edit-form-group {
+            margin-bottom: 1.15rem;
+        }
+
+        .edit-form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .edit-form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border, #e2e8f0);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--surface-2, #f7fafc);
+            transition: border 0.25s;
+            outline: none;
+        }
+
+        .edit-form-group input:focus {
+            border-color: var(--primary, #667eea);
+            background: #fff;
+        }
+
+        .edit-form-group input[readonly] {
+            background: #f1f5f9;
+            color: #aaa;
+        }
+
+        .edit-form-action {
+            display: flex;
+            gap: 0.9rem;
+            justify-content: flex-end;
+            margin-top: 1.3rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border: 2px solid #fff;
+            border-top: 2px solid var(--primary, #667eea);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: -0.15em;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .edit-panel {
+                min-width: 0;
+                padding: 1.2rem 0.8rem 0.8rem 0.8rem;
+                border-radius: 11px;
+                max-width: 99vw;
+            }
+
+            .edit-panel-title {
+                font-size: 1.05rem;
+            }
+
+            .edit-panel-nodeId {
+                font-size: 0.9rem;
+            }
+
+            .edit-form-group input {
+                padding: 0.6rem 0.7rem;
+                font-size: 1rem;
+            }
+
+            .edit-form-action {
+                gap: 0.6rem;
+            }
+        }
+
+        #pending-section {
+            margin-top: 1.2rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ===== Footer ===== */
+        .app-footer {
+            margin-top: 2rem;
+            padding: 1.2rem 1rem;
+            border-top: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(8px);
+            animation: footerFadeIn 0.6s ease forwards;
+        }
+
+        /* 淡入动画 */
+        @keyframes footerFadeIn {
+            to {
+                opacity: 0.75;
+                transform: none;
+            }
+        }
+
+        .app-footer:hover {
+            opacity: 1;
+        }
+
+        /* 布局 */
+        .footer-inner {
+            max-width: var(--container);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        /* 左侧 */
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        .footer-title {
+            color: var(--text);
+            font-weight: 900;
+        }
+
+        .footer-divider {
+            opacity: 0.5;
+        }
+
+        .footer-license {
+            opacity: 0.85;
+        }
+
+        /* 右侧 */
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+            background: var(--surface-2);
+            transform: translateY(-1px);
+        }
+
+        /* GitHub SVG */
+        .footer-icon svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .footer-link:hover .footer-icon svg {
+            transform: scale(1.15);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 640px) {
+            .app-footer {
+                padding: 1rem 0.6rem;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .footer-left {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .footer-link {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
+<div class="container">
     <div class="header">
-      <div class="header-title">ZTPanel</div>
-      <div class="header-network-info">
-        <span id="network-subtitle">xxxxxxxx</span>
-        <button class="btn btn-xs btn-outline btn-switch-network" id="switch-network-btn">切换网络</button>
-      </div>
+        <div class="header-title">ZTPanel</div>
+        <div class="header-network-info">
+            <span id="network-subtitle">xxxxxxxx</span>
+            <button class="btn btn-xs btn-outline btn-switch-network" id="switch-network-btn">切换网络</button>
+        </div>
 
-      <div class="header-time">🕐 <span id="refresh-time">--:--:--</span></div>
+        <div class="header-time">🕐 <span id="refresh-time">--:--:--</span></div>
 
-      <div class="header-actions">
-        <button class="btn btn-outline" onclick="copyKanbanLink()" title="复制链接">🔗 复制链接</button>
-        <button class="btn btn-primary" id="refresh-button" title="刷新数据">🔄 刷新数据</button>
-      </div>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="copyKanbanLink()" title="复制链接">🔗 复制链接</button>
+            <button class="btn btn-primary" id="refresh-button" title="刷新数据">🔄 刷新数据</button>
+        </div>
     </div>
 
     <div id="error-message" class="error-msg"></div>
 
     <!-- Network Info (放在统计上面) -->
     <div class="overview-card">
-      <div class="overview-top">
-        <div id="overview-title" class="overview-title">
-          <span>加载中...</span>
+        <div class="overview-top">
+            <div id="overview-title" class="overview-title">
+                <span>加载中...</span>
+            </div>
         </div>
-      </div>
 
-      <div class="overview-details">
-        <div class="network-routes-container">
-          <div id="network-routes">
-            <!-- 路由内容由 JS 动态填充 -->
-          </div>
+        <div class="overview-details">
+            <div class="network-routes-container">
+                <div id="network-routes">
+                    <!-- 路由内容由 JS 动态填充 -->
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="overview-stats">
-        <div class="stat-inline">
-          <div class="num" id="total-members">0</div>
-          <div class="stat-label">全部设备</div>
+        <div class="overview-stats">
+            <div class="stat-inline">
+                <div class="num" id="total-members">0</div>
+                <div class="stat-label">全部设备</div>
+            </div>
+            <div class="stat-inline success">
+                <div class="num" id="online-members">0</div>
+                <div class="stat-label">当前在线</div>
+            </div>
+            <div class="stat-inline warning">
+                <div class="num" id="offline-members">0</div>
+                <div class="stat-label">当前离线</div>
+            </div>
+            <div class="stat-inline danger">
+                <div class="num" id="pending-members-count">0</div>
+                <div class="stat-label">等待授权</div>
+            </div>
         </div>
-        <div class="stat-inline success">
-          <div class="num" id="online-members">0</div>
-          <div class="stat-label">当前在线</div>
-        </div>
-        <div class="stat-inline warning">
-          <div class="num" id="offline-members">0</div>
-          <div class="stat-label">当前离线</div>
-        </div>
-        <div class="stat-inline danger">
-          <div class="num" id="pending-members-count">0</div>
-          <div class="stat-label">等待授权</div>
-        </div>
-      </div>
     </div>
 
     <!-- Authorized Members -->
     <div class="section">
-      <div class="section-header">
-        <div>
-          <span class="section-title">👥 成员</span>
-          <span class="section-count" id="authorized-count"></span>
-        </div>
-        <div class="filter-group" id="filter-group">
-          <button class="filter-btn active" data-section="authorized" data-filter="all" onclick="filterMembers('authorized', 'all', this)">全部</button>
-          <button class="filter-btn" data-section="authorized" data-filter="online" onclick="filterMembers('authorized', 'online', this)">在线</button>
-          <button class="filter-btn" data-section="authorized" data-filter="offline" onclick="filterMembers('authorized', 'offline', this)">离线</button>
-        </div>
-      </div>
-      <div class="members-grid" id="authorized-members">
-        <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 200px; padding: 2rem;">
-          <svg style="width: 32px; height: 32px; animation: spin 1s linear infinite; color: var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 3v3m6.364 3.364l-2.121 2.121M21 12h-3m-3.364 6.364l-2.121-2.121M12 21v-3m-6.364-3.364l2.121-2.121M3 12H6m3.364-6.364l2.121 2.121" stroke-linecap="round"></path>
-          </svg>
-          <div style="margin-left: 1rem; font-size: 0.9rem; color: var(--text-light); display: flex; flex-direction: column; gap: 0.25rem;">
-            <div>正在连接 ZeroTier 云端...</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pending Members (仅私有网络显示) -->
-      <div class="section" id="pending-section">
         <div class="section-header">
-          <div>
-            <span class="section-title">⏳ 待授权</span>
-            <span class="section-count" id="pending-count"></span>
-          </div>
+            <div>
+                <span class="section-title">👥 成员</span>
+                <span class="section-count" id="authorized-count"></span>
+            </div>
+            <div class="filter-group" id="filter-group">
+                <button class="filter-btn active" data-section="authorized" data-filter="all"
+                        onclick="filterMembers('authorized', 'all', this)">全部
+                </button>
+                <button class="filter-btn" data-section="authorized" data-filter="online"
+                        onclick="filterMembers('authorized', 'online', this)">在线
+                </button>
+                <button class="filter-btn" data-section="authorized" data-filter="offline"
+                        onclick="filterMembers('authorized', 'offline', this)">离线
+                </button>
+            </div>
         </div>
-        <div id="pending-members"></div>
-      </div>
+        <div class="members-grid" id="authorized-members">
+            <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 200px; padding: 2rem;">
+                <svg style="width: 32px; height: 32px; animation: spin 1s linear infinite; color: var(--primary);"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 3v3m6.364 3.364l-2.121 2.121M21 12h-3m-3.364 6.364l-2.121-2.121M12 21v-3m-6.364-3.364l2.121-2.121M3 12H6m3.364-6.364l2.121 2.121"
+                          stroke-linecap="round"></path>
+                </svg>
+                <div style="margin-left: 1rem; font-size: 0.9rem; color: var(--text-light); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div>正在连接 ZeroTier 云端...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Members (仅私有网络显示) -->
+        <div class="section" id="pending-section">
+            <div class="section-header">
+                <div>
+                    <span class="section-title">⏳ 待授权</span>
+                    <span class="section-count" id="pending-count"></span>
+                </div>
+            </div>
+            <div id="pending-members"></div>
+        </div>
     </div>
 
 
     <!-- 编辑成员弹窗 -->
     <div id="edit-panel-mask" class="edit-mask" style="display:none;">
-      <div class="edit-panel">
-        <form id="edit-form" autocomplete="off">
-          <h2 class="edit-panel-title">编辑设备信息</h2>
-          <input type="hidden" id="edit-nodeId" />
+        <div class="edit-panel">
+            <form id="edit-form" autocomplete="off">
+                <h2 class="edit-panel-title">编辑设备信息</h2>
+                <h1 class="edit-panel-nodeId" id="edit-panel-nodeId" ></h1>
+                <input type="hidden" id="edit-nodeId"/>
 
-          <div class="edit-form-group">
-            <label for="edit-name">名称</label>
-            <input id="edit-name" maxlength="20" />
-          </div>
-          <div class="edit-form-group">
-            <label for="edit-desc">备注</label>
-            <input id="edit-desc" maxlength="64" />
-          </div>
-          <div class="edit-form-group">
-            <label for="edit-ip">IPv4</label>
-            <input id="edit-ip" maxlength="15"/>
-          </div>
-          <div class="edit-form-action">
-            <button type="button" class="btn btn-outline" id="edit-cancel">取消</button>
-            <button type="submit" class="btn btn-primary" id="edit-save"><span class="save-text">保存</span></button>
-          </div>
-        </form>
-      </div>
+                <div class="edit-form-group">
+                    <label for="edit-name">名称</label>
+                    <input id="edit-name" maxlength="20"/>
+                </div>
+                <div class="edit-form-group">
+                    <label for="edit-desc">备注</label>
+                    <input id="edit-desc" maxlength="64"/>
+                </div>
+                <div class="edit-form-group">
+                    <label for="edit-ip">IPv4</label>
+                    <input id="edit-ip" maxlength="15"/>
+                </div>
+                <div class="edit-form-action">
+                    <button type="button" class="btn btn-outline" id="edit-cancel">取消</button>
+                    <button type="submit" class="btn btn-primary" id="edit-save"><span class="save-text">保存</span>
+                    </button>
+                </div>
+            </form>
+        </div>
 
     </div>
 
 
     <footer class="app-footer">
-      <div class="footer-inner">
+        <div class="footer-inner">
 
-        <div class="footer-left">
-          <span class="footer-title">ZTPanel</span>
-          <span class="footer-divider">·</span>
-          <span class="footer-license" id="footer-license">
+            <div class="footer-left">
+                <span class="footer-title">ZTPanel</span>
+                <span class="footer-divider">·</span>
+                <span class="footer-license" id="footer-license">
           MIT License
         </span>
-        </div>
+            </div>
 
-        <div class="footer-right">
-          <a href="https://github.com/Zakkoree/ZTPanel" target="_blank" class="footer-link">
+            <div class="footer-right">
+                <a href="https://github.com/Zakkoree/ZTPanel" target="_blank" class="footer-link">
           <span class="footer-icon">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 .5C5.65.5.75 5.4.75 11.75c0 5.1 3.3 9.4 7.9 10.95.6.1.8-.25.8-.55v-2.15c-3.2.7-3.9-1.55-3.9-1.55-.55-1.35-1.35-1.7-1.35-1.7-1.1-.75.1-.75.1-.75 1.2.1 1.85 1.25 1.85 1.25 1.1 1.85 2.9 1.3 3.6 1 .1-.8.4-1.3.75-1.6-2.55-.3-5.25-1.3-5.25-5.7 0-1.25.45-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.15 0 0 1-.3 3.25 1.2a11.3 11.3 0 0 1 5.9 0c2.25-1.5 3.25-1.2 3.25-1.2.6 1.65.2 2.85.1 3.15.75.8 1.2 1.85 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.45.4.8 1.1.8 2.2v3.25c0 .3.2.65.8.55 4.6-1.55 7.9-5.85 7.9-10.95C23.25 5.4 18.35.5 12 .5z"/>
             </svg>
           </span>
-            GitHub
-          </a>
+                    GitHub
+                </a>
+            </div>
+
         </div>
-
-      </div>
     </footer>
-  </div>
-  <div id="toast" class="toast"></div>
+</div>
+<div id="toast" class="toast"></div>
 
-  <script>
+<script>
     const params = new URLSearchParams(window.location.search);
     const netId = params.get('net_id');
     const token = params.get('token');
@@ -1550,33 +1783,35 @@
 
     /* ===== 自动年份 ===== */
     (function () {
-      const el = document.getElementById('footer-license');
-      if (el) {
-        const year = new Date().getFullYear();
-        el.textContent = `MIT License © ${year}`;
-      }
+        const el = document.getElementById('footer-license');
+        if (el) {
+            const year = new Date().getFullYear();
+            el.textContent = `MIT License © ${year}`;
+        }
     })();
 
-    switchNetworkBtn.onclick = () => {window.location.href = `networks?token=${encodeURIComponent(token)}`};
+    switchNetworkBtn.onclick = () => {
+        window.location.href = `networks?token=${encodeURIComponent(token)}`
+    };
 
     function closeAllMemberMenus() {
-      document.querySelectorAll('.member-menu.open').forEach(m => m.classList.remove('open'));
+        document.querySelectorAll('.member-menu.open').forEach(m => m.classList.remove('open'));
     }
 
     function toggleMemberMenu(e, nodeId) {
-      e.stopPropagation();
-      const menu = document.querySelector(`.member-menu[data-menu-for="${nodeId}"]`);
-      if (!menu) return;
+        e.stopPropagation();
+        const menu = document.querySelector(`.member-menu[data-menu-for="${nodeId}"]`);
+        if (!menu) return;
 
-      const isOpen = menu.classList.contains('open');
-      closeAllMemberMenus();
-      if (!isOpen) menu.classList.add('open');
+        const isOpen = menu.classList.contains('open');
+        closeAllMemberMenus();
+        if (!isOpen) menu.classList.add('open');
     }
 
     document.addEventListener('click', () => closeAllMemberMenus());
 
     document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape') closeAllMemberMenus();
+        if (ev.key === 'Escape') closeAllMemberMenus();
     });
 
     window.toggleMemberMenu = toggleMemberMenu;
@@ -1584,79 +1819,83 @@
 
 
     function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     function updateTime() {
-      const now = new Date();
-      document.getElementById('refresh-time').textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const now = new Date();
+        document.getElementById('refresh-time').textContent = now.toLocaleTimeString('zh-CN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
     }
 
     function copyKanbanLink() {
-      const link = window.location.href;
-      navigator.clipboard.writeText(link).then(() => {
-        showToast('✅ 已复制');
-        if (!localStorage.getItem('notice_shown')) {
-          setTimeout(() => alert('⚠️ 安全提示：链接包含访问令牌，请勿公开分享！'), 500);
-          localStorage.setItem('notice_shown', '1');
-        }
-      }).catch(() => showToast('❌ 复制失败'));
+        const link = window.location.href;
+        navigator.clipboard.writeText(link).then(() => {
+            showToast('✅ 已复制');
+            if (!localStorage.getItem('notice_shown')) {
+                setTimeout(() => alert('⚠️ 安全提示：链接包含访问令牌，请勿公开分享！'), 500);
+                localStorage.setItem('notice_shown', '1');
+            }
+        }).catch(() => showToast('❌ 复制失败'));
     }
 
     function isOnline(m) {
-      const t = m.lastOnline || m.lastSeen || 0;
-      return t && (Date.now() - t) < 120000;
+        const t = m.lastOnline || m.lastSeen || 0;
+        return t && (Date.now() - t) < 120000;
     }
 
     function filterMembers(section, filter, btn) {
-      document.querySelectorAll(`.filter-btn[data-section="${section}"]`).forEach(b => {
-        b.classList.remove('active');
-      });
-      btn.classList.add('active');
+        document.querySelectorAll(`.filter-btn[data-section="${section}"]`).forEach(b => {
+            b.classList.remove('active');
+        });
+        btn.classList.add('active');
 
-      currentFilter = filter;
-      // 存储当前筛选
-      localStorage.setItem(`ztFilter_${netId}`, filter);
+        currentFilter = filter;
+        // 存储当前筛选
+        localStorage.setItem(`ztFilter_${netId}`, filter);
 
-      applyFilter();
+        applyFilter();
     }
 
     function applyFilter() {
-      const cards = document.querySelectorAll('.member-card[data-section="authorized"]');
-      cards.forEach(card => {
-        const isOnlineCard = card.dataset.online === 'yes';
+        const cards = document.querySelectorAll('.member-card[data-section="authorized"]');
+        cards.forEach(card => {
+            const isOnlineCard = card.dataset.online === 'yes';
 
-        if (currentFilter === 'all') {
-          card.classList.remove('hidden');
-        } else if (currentFilter === 'online') {
-          card.classList.toggle('hidden', !isOnlineCard);
-        } else if (currentFilter === 'offline') {
-          card.classList.toggle('hidden', isOnlineCard);
-        }
-      });
+            if (currentFilter === 'all') {
+                card.classList.remove('hidden');
+            } else if (currentFilter === 'online') {
+                card.classList.toggle('hidden', !isOnlineCard);
+            } else if (currentFilter === 'offline') {
+                card.classList.toggle('hidden', isOnlineCard);
+            }
+        });
     }
 
     function renderMember(m, auth) {
-      const online = isOnline(m);
-      const ip = m.config?.ipAssignments?.[0] || '';
-      const lastSeen = m.lastOnline || m.lastSeen || 0;
-      const desc = m.description || '';
+        const online = isOnline(m);
+        const ip = m.config?.ipAssignments?.[0] || '';
+        const lastSeen = m.lastOnline || m.lastSeen || 0;
+        const desc = m.description || '';
 
-      let actionMenu = '';
-      if (isPrivateNetwork) {
+        let actionMenu = '';
+        if (isPrivateNetwork) {
 
-        actionMenu = `
+            actionMenu = `
           <button class="menu-item" onclick="event.stopPropagation(); ${auth ? "unauthorize" : "authorize"}('${m.nodeId}'); closeAllMemberMenus();">
             ${auth ? '🔒 取消授权' : '✅ 授权加入'}
           </button>
           <div class="menu-sep"></div>
         `;
-      }
+        }
 
-      return `
+        return `
         <div class="member-card ${isFirstRender ? 'animate-in' : ''}" data-section="authorized" data-online="${online ? 'yes' : 'no'}">
 
           <div class="member-head">
@@ -1671,12 +1910,12 @@
               <button class="menu-trigger" onclick="toggleMemberMenu(event, '${m.nodeId}')" title="操作">⋯</button>
               <div class="menu-panel">
                 <button class="menu-item" onclick="event.stopPropagation();
-                document.getElementById('edit-panel-mask').style.display = 'flex';
+                document.getElementById('edit-panel-nodeId').innerHTML = '${m.nodeId}';
                 document.getElementById('edit-nodeId').value = '${m.nodeId}';
                 document.getElementById('edit-name').value = '${m.name ? m.name : ''}';
                 document.getElementById('edit-desc').value = \`${m.description ? m.description : ''}\`;
-                document.getElementById('edit-ip').value = '${m.config?.ipAssignments?.[0]?m.config?.ipAssignments?.[0]:''}';
-                document.getElementById('edit-name').focus();
+                document.getElementById('edit-ip').value = '${m.config?.ipAssignments?.[0] ? m.config?.ipAssignments?.[0] : ''}';
+                document.getElementById('edit-panel-mask').style.display = 'flex';
                 closeAllMemberMenus();">
                   📝 编辑信息
                 </button>
@@ -1712,7 +1951,7 @@
 
           <div class="member-info-item">
             <span class="info-label">🏷️ 版本</span>
-            <span class="info-value">${(m.clientVersion && m.clientVersion!=='-1.-1.-1')? m.clientVersion: ''}</span>
+            <span class="info-value">${(m.clientVersion && m.clientVersion !== '-1.-1.-1') ? m.clientVersion : ''}</span>
           </div>
           ${lastSeen ? `
           <div class="member-info-item">
@@ -1726,8 +1965,8 @@
     }
 
     function renderPendingList(members) {
-      if (!members.length) {
-        return `
+        if (!members.length) {
+            return `
           <div class="empty-state">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--primary); opacity: 0.6;">
               <circle cx="11" cy="11" r="8"></circle>
@@ -1736,13 +1975,13 @@
             <div class="empty-text">当前没有待处理的授权请求</div>
           </div>
         `;
-      }
+        }
 
-      return `
+        return `
         <div class="pending-table">
           <div class="pending-table-header">
             <span>名称</span>
-            <span>设备</span>
+            <span>标识</span>
             <span>备注</span>
             <span>内网</span>
             <span>公网</span>
@@ -1756,7 +1995,7 @@
                 <span class="name-text" title="${m.name || '未命名'}">${m.name || '未命名'}</span>
               </div>
 
-              <div class="pending-table-cell" data-label="设备" title="${m.nodeId}">
+              <div class="pending-table-cell" data-label="标识" title="${m.nodeId}">
                 ${m.nodeId}
               </div>
 
@@ -1773,7 +2012,7 @@
               </div>
 
               <div class="pending-table-cell" data-label="版本">
-                ${(m.clientVersion && m.clientVersion!=='-1.-1.-1')? m.clientVersion: ''}
+                ${(m.clientVersion && m.clientVersion !== '-1.-1.-1') ? m.clientVersion : ''}
               </div>
 
               <div class="pending-table-actions" data-label="操作">
@@ -1787,63 +2026,67 @@
     }
 
     function getCached() {
-      try {
-        const c = localStorage.getItem(CACHE_KEY);
-        if (c) {
-          const p = JSON.parse(c);
-          if (Date.now() - p.t < CACHE_TIME) return p.d;
+        try {
+            const c = localStorage.getItem(CACHE_KEY);
+            if (c) {
+                const p = JSON.parse(c);
+                if (Date.now() - p.t < CACHE_TIME) return p.d;
+            }
+        } catch (e) {
         }
-      } catch (e) {}
-      return null;
+        return null;
     }
 
     function setCached(d) {
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), d }));
-      } catch (e) {}
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({t: Date.now(), d}));
+        } catch (e) {
+        }
     }
 
     async function fetchNet() {
-      const c = localStorage.getItem(NET_CACHE);
-      if (c) {
-        try {
-          updateNetInfo(JSON.parse(c));
-          return;
-        } catch (e) {}
-      }
+        const c = localStorage.getItem(NET_CACHE);
+        if (c) {
+            try {
+                updateNetInfo(JSON.parse(c));
+                return;
+            } catch (e) {
+            }
+        }
 
-      const path = `/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId)}`;
-      try {
-        const r = await fetch(path);
-        if (!r.ok) return;
-        const d = await r.json();
-        localStorage.setItem(NET_CACHE, JSON.stringify(d));
-        updateNetInfo(d);
-      } catch (e) {}
+        const path = `/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId)}`;
+        try {
+            const r = await fetch(path);
+            if (!r.ok) return;
+            const d = await r.json();
+            localStorage.setItem(NET_CACHE, JSON.stringify(d));
+            updateNetInfo(d);
+        } catch (e) {
+        }
     }
 
     function updateNetInfo(d) {
-      if (d?.config) {
-        const c = d.config;
-        isPrivateNetwork = c.private !== false;
-        const networkOverviewContainer = document.getElementById('overview-title');
+        if (d?.config) {
+            const c = d.config;
+            isPrivateNetwork = c.private !== false;
+            const networkOverviewContainer = document.getElementById('overview-title');
 
-        let ips = '-';
-        if (Array.isArray(c.ipAssignmentPools) && c.ipAssignmentPools.length) {
-          ips = c.ipAssignmentPools.map(p => `${p.ipRangeStart || p.start} → ${p.ipRangeEnd || p.end}`).join(', ');
-        }
-        networkOverviewContainer.innerHTML = `
+            let ips = '-';
+            if (Array.isArray(c.ipAssignmentPools) && c.ipAssignmentPools.length) {
+                ips = c.ipAssignmentPools.map(p => `${p.ipRangeStart || p.start} → ${p.ipRangeEnd || p.end}`).join(', ');
+            }
+            networkOverviewContainer.innerHTML = `
           <span>${c.name || '未命名网络'}</span>
           <span class="net-tag tag-${isPrivateNetwork ? 'blue' : 'orange'}" >${isPrivateNetwork ? '私有' : '公共'}</span>
           ${d.description ? `<span class="net-tag tag-gray" title="${d.description}">${d.description}</span>` : ''}
         `;
 
 
-        const routesHtml  = Array.isArray(c.routes) && c.routes.length
+            document.getElementById('network-routes').innerHTML = Array.isArray(c.routes) && c.routes.length
                 ? c.routes.map(route => {
-                  const target = route.target || route.destination || '-';
-                  const via = (route.via ? ('via → ' + route.via) : (route.viaRouter ? ('via → ' + route.viaRouter) : ('(LAN) ' + ips)));
-                  return `
+                    const target = route.target || route.destination || '-';
+                    const via = (route.via ? ('via → ' + route.via) : (route.viaRouter ? ('via → ' + route.viaRouter) : ('(LAN) ' + ips)));
+                    return `
               <div class="route-item-inline">
                 <span class="route-target">${target}</span>
                 <span class="route-via">${via}</span>
@@ -1851,29 +2094,28 @@
               `;
                 }).join('')
                 : '-';
-        document.getElementById('network-routes').innerHTML = routesHtml ;
-      }
+        }
     }
 
     function renderData(d) {
-      if (!Array.isArray(d)) return;
-      allMembers = d;
+        if (!Array.isArray(d)) return;
+        allMembers = d;
 
-      const auth = d.filter(m => m.config.authorized);
-      const pend = d.filter(m => !m.config.authorized);
-      const on = auth.filter(isOnline).length;
-      const off = auth.length - on;
+        const auth = d.filter(m => m.config.authorized);
+        const pend = d.filter(m => !m.config.authorized);
+        const on = auth.filter(isOnline).length;
+        const off = auth.length - on;
 
-      document.getElementById('total-members').textContent = d.length;
-      document.getElementById('online-members').textContent = on;
-      document.getElementById('offline-members').textContent = off;
-      document.getElementById('pending-members-count').textContent = pend.length;
-      document.getElementById('authorized-count').textContent = auth.length ? ` (${auth.length})` : '';
-      document.getElementById('pending-count').textContent = pend.length ? ` (${pend.length})` : '';
+        document.getElementById('total-members').textContent = d.length;
+        document.getElementById('online-members').textContent = on;
+        document.getElementById('offline-members').textContent = off;
+        document.getElementById('pending-members-count').textContent = pend.length;
+        document.getElementById('authorized-count').textContent = auth.length ? ` (${auth.length})` : '';
+        document.getElementById('pending-count').textContent = pend.length ? ` (${pend.length})` : '';
 
-      authContainer.innerHTML = auth.length
-              ? auth.map(m => renderMember(m, true)).join('')
-              : `<div class="empty-state">
+        authContainer.innerHTML = auth.length
+            ? auth.map(m => renderMember(m, true)).join('')
+            : `<div class="empty-state">
             <!-- 使用 SVG 图标，比 Emoji 更清晰专业 -->
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); opacity: 0.6;">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -1883,53 +2125,53 @@
             <div class="empty-text">当前网络中没有成员设备</div>
           </div>`;
 
-      if (isPrivateNetwork) {
-        pendingSection.style.display = 'block';
-        pendingContainer.innerHTML = renderPendingList(pend);
-      } else {
-        pendingSection.style.display = 'none';
-      }
+        if (isPrivateNetwork) {
+            pendingSection.style.display = 'block';
+            pendingContainer.innerHTML = renderPendingList(pend);
+        } else {
+            pendingSection.style.display = 'none';
+        }
 
-      // 获取上次选择的筛选项
-      const saved = localStorage.getItem(`ztFilter_${netId}`);
-      currentFilter = saved || 'all';
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.filter === currentFilter);
-      });
-      applyFilter();
+        // 获取上次选择的筛选项
+        const saved = localStorage.getItem(`ztFilter_${netId}`);
+        currentFilter = saved || 'all';
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.filter === currentFilter);
+        });
+        applyFilter();
 
-      errorMsg.style.display = 'none';
-      updateTime();
+        errorMsg.style.display = 'none';
+        updateTime();
 
-      if (isFirstRender) {
-        setTimeout(() => {
-          isFirstRender = false;
-        }, 400);
-      }
+        if (isFirstRender) {
+            setTimeout(() => {
+                isFirstRender = false;
+            }, 400);
+        }
     }
 
     async function fetchData() {
-      const c = getCached();
-      if (c) renderData(c);
+        const c = getCached();
+        if (c) renderData(c);
 
-      const p = `/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member')}`;
-      try {
-        const r = await fetch(p);
-        if (!r.ok) {
-          if( r.status === 401) {
-            throw new Error(`无效访问令牌`);
-          } else {
-            throw new Error(`API Error: ${r.statusText}`);
-          }
+        const p = `/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member')}`;
+        try {
+            const r = await fetch(p);
+            if (!r.ok) {
+                if (r.status === 401) {
+                    throw new Error(`无效访问令牌`);
+                } else {
+                    throw new Error(`API Error: ${r.statusText}`);
+                }
+            }
+
+            const d = await r.json();
+            setCached(d);
+            renderData(d);
+        } catch (e) {
+            errorMsg.style.display = 'block';
+            errorMsg.textContent = `⚠️ 加载失败: ${e.message}`;
         }
-
-        const d = await r.json();
-        setCached(d);
-        renderData(d);
-      } catch (e) {
-        errorMsg.style.display = 'block';
-        errorMsg.textContent = `⚠️ 加载失败: ${e.message}`;
-      }
     }
 
     fetchNet();
@@ -1939,175 +2181,180 @@
 
 
     document.getElementById('refresh-button').addEventListener('click', () => {
-      const btn = document.getElementById('refresh-button');
-      btn.disabled = true;
-      btn.textContent = '⏳ 刷新数据';
+        const btn = document.getElementById('refresh-button');
+        btn.disabled = true;
+        btn.textContent = '⏳ 刷新数据';
 
-      localStorage.removeItem(CACHE_KEY);
-      fetchData().finally(() => {
-        btn.disabled = false;
-        btn.textContent = '🔄 刷新数据';
-      });
+        localStorage.removeItem(CACHE_KEY);
+        fetchData().finally(() => {
+            btn.disabled = false;
+            btn.textContent = '🔄 刷新数据';
+        });
 
-      showToast('🔄 刷新中...');
+        showToast('🔄 刷新中...');
     });
 
 
     async function authorize(id) {
-      try {
-        const r = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member/' + id)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ config: { authorized: true } })
-        });
-        if (!r.ok) {
-          if( r.status === 401) {
-            throw new Error(`无效访问令牌`);
-          } else {
-            throw new Error(`授权失败: ${r.statusText}`);
-          }
+        try {
+            const r = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member/' + id)}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({config: {authorized: true}})
+            });
+            if (!r.ok) {
+                if (r.status === 401) {
+                    throw new Error(`无效访问令牌`);
+                } else {
+                    throw new Error(`授权失败: ${r.statusText}`);
+                }
+            }
+            showToast('✅ 已授权');
+            localStorage.removeItem(CACHE_KEY);
+            fetchData();
+        } catch (e) {
+            showToast('❌ ' + e.message);
         }
-        showToast('✅ 已授权');
-        localStorage.removeItem(CACHE_KEY);
-        fetchData();
-      } catch (e) {
-        showToast('❌ ' + e.message);
-      }
     }
 
     async function unauthorize(id) {
-      if (!confirm('确定取消授权？')) return;
-      try {
-        const r = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member/' + id)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ config: { authorized: false } })
-        });
-        if (!r.ok) {
-          if( r.status === 401) {
-            throw new Error(`无效访问令牌`);
-          } else {
-            throw new Error(`取消失败: ${r.statusText}`);
-          }
+        if (!confirm('确定取消授权？')) return;
+        try {
+            const r = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member/' + id)}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({config: {authorized: false}})
+            });
+            if (!r.ok) {
+                if (r.status === 401) {
+                    throw new Error(`无效访问令牌`);
+                } else {
+                    throw new Error(`取消失败: ${r.statusText}`);
+                }
+            }
+            showToast('✅ 已取消');
+            localStorage.removeItem(CACHE_KEY);
+            fetchData();
+        } catch (e) {
+            showToast('❌ ' + e.message);
         }
-        showToast('✅ 已取消');
-        localStorage.removeItem(CACHE_KEY);
-        fetchData();
-      } catch (e) {
-        showToast('❌ ' + e.message);
-      }
     }
 
     async function removeMember(id) {
-      if (!confirm('确定移除此成员？')) return;
-      try {
-        const r = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member/' + id)}`, {
-          method: 'DELETE'
-        });
-        if (!r.ok) {
-          if( r.status === 401) {
-            throw new Error(`无效访问令牌`);
-          } else {
-            throw new Error(`移除失败: ${r.statusText}`);
-          }
+        if (!confirm('确定移除此成员？')) return;
+        try {
+            const r = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member/' + id)}`, {
+                method: 'DELETE'
+            });
+            if (!r.ok) {
+                if (r.status === 401) {
+                    throw new Error(`移除失败: 无效访问令牌`);
+                } else {
+                    throw new Error(`移除失败: ${r.statusText}`);
+                }
+            }
+            showToast('✅ 已移除');
+            localStorage.removeItem(CACHE_KEY);
+            fetchData();
+        } catch (e) {
+            showToast('❌ ' + e.message);
         }
-        showToast('✅ 已移除');
-        localStorage.removeItem(CACHE_KEY);
-        fetchData();
-      } catch (e) {
-        showToast('❌ ' + e.message);
-      }
     }
 
     // 关闭弹窗
     function closeEditPanel() {
-      document.getElementById('edit-panel-mask').style.display = 'none';
+        document.getElementById('edit-panel-mask').style.display = 'none';
     }
+
     // ESC/点击遮罩关闭
-    document.getElementById('edit-panel-mask').addEventListener('mousedown', function(e){
-      if (e.target === this) closeEditPanel();
+    document.getElementById('edit-panel-mask').addEventListener('mousedown', function (e) {
+        if (e.target === this) closeEditPanel();
     });
     document.getElementById('edit-cancel').onclick = closeEditPanel;
-    document.addEventListener('keydown', function(e){
-      if (document.getElementById('edit-panel-mask').style.display !== 'none' && e.key === 'Escape') closeEditPanel();
+    document.addEventListener('keydown', function (e) {
+        if (document.getElementById('edit-panel-mask').style.display !== 'none' && e.key === 'Escape') closeEditPanel();
     });
 
     const editName = document.getElementById('edit-name');
     const editIp = document.getElementById('edit-ip');
 
     editIp.addEventListener('input', (e) => {
-      let value = e.target.value;
-      // 1. 去除所有空格
-      value = value.replace(/\s/g, '');
-      // 2. 只保留数字和点，删除其他字符（如字母、特殊符号）
-      value = value.replace(/[^\d.]/g, '');
-      // 3. 防止连续输入点 (例如把 "192..1" 变成 "192.1")
-      value = value.replace(/\.{2,}/g, '.');
-      // 4. (可选) 强制第一位必须是数字，防止以点开头
-      if (value.startsWith('.')) {
-        value = value.substring(1);
-      }
-      // 5. (可选) 限制每一段的长度不超过 3 位
-      // 这一步比较高级，它会智能截断，比如输入 "1234" 会自动变回 "123"
-      const parts = value.split('.');
-      if (parts.length > 4) {
-        // 如果段数超过4段，截取前4段
-        value = parts.slice(0, 4).join('.');
-      } else {
-        // 检查每一段是否超过3位
-        const newParts = parts.map(part => part.slice(0, 3));
-        value = newParts.join('.');
-      }
-      // 更新输入框的值
-      e.target.value = value;
+        let value = e.target.value;
+        // 1. 去除所有空格
+        value = value.replace(/\s/g, '');
+        // 2. 只保留数字和点，删除其他字符（如字母、特殊符号）
+        value = value.replace(/[^\d.]/g, '');
+        // 3. 防止连续输入点 (例如把 "192..1" 变成 "192.1")
+        value = value.replace(/\.{2,}/g, '.');
+        // 4. (可选) 强制第一位必须是数字，防止以点开头
+        if (value.startsWith('.')) {
+            value = value.substring(1);
+        }
+        // 5. (可选) 限制每一段的长度不超过 3 位
+        // 这一步比较高级，它会智能截断，比如输入 "1234" 会自动变回 "123"
+        const parts = value.split('.');
+        if (parts.length > 4) {
+            // 如果段数超过4段，截取前4段
+            value = parts.slice(0, 4).join('.');
+        } else {
+            // 检查每一段是否超过3位
+            const newParts = parts.map(part => part.slice(0, 3));
+            value = newParts.join('.');
+        }
+        // 更新输入框的值
+        e.target.value = value;
     });
 
     // 表单保存事件
-    document.getElementById('edit-form').onsubmit = async function(e) {
-      e.preventDefault();
-      const nodeId = document.getElementById('edit-nodeId').value;
-      const name = editName.value.trim();
-      const desc = document.getElementById('edit-desc').value.trim();
-      const ip = editIp.value.trim();
-      const ips = ip? [ip]:[];
+    document.getElementById('edit-form').onsubmit = async function (e) {
+        e.preventDefault();
+        const nodeId = document.getElementById('edit-nodeId').value;
+        const name = editName.value.trim();
+        const desc = document.getElementById('edit-desc').value.trim();
+        const ip = editIp.value.trim();
+        const ips = ip ? [ip] : [];
 
-      const saveBtn = document.getElementById('edit-save');
-      const cancelBtn = document.getElementById('edit-cancel');
-      if (!nodeId) return;
+        const saveBtn = document.getElementById('edit-save');
+        const cancelBtn = document.getElementById('edit-cancel');
+        if (!nodeId) return;
 
-      saveBtn.disabled = true;
-      cancelBtn.disabled = true;
-      const oldText = saveBtn.textContent;
-      saveBtn.innerHTML = '<span class="spinner" style="margin-right:8px;"></span>保存中...';
+        saveBtn.disabled = true;
+        cancelBtn.disabled = true;
+        const oldText = saveBtn.textContent;
+        saveBtn.innerHTML = '<span class="spinner" style="margin-right:8px;"></span>保存中...';
 
-      try {
-        const res = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member/' + nodeId)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name,
-            description: desc,
-            config:{
-              ipAssignments:ips
+        try {
+            const res = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member/' + nodeId)}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name,
+                    description: desc,
+                    config: {
+                        ipAssignments: ips
+                    }
+                })
+            });
+
+            if (res.ok) {
+                showToast('✅ 信息已更新');
+                closeEditPanel();
+                localStorage.removeItem(CACHE_KEY);
+                fetchData();
+            } else {
+                if (res.status === 401) {
+                    showToast('❌ 更新失败: 无效访问令牌');
+                } else {
+                    showToast('❌ 更新失败: ' + res.statusText);
+                }
             }
-          })
-        });
-
-        if (res.ok) {
-          showToast('✅ 信息已更新');
-          closeEditPanel();
-          localStorage.removeItem(CACHE_KEY);
-          fetchData();
-        } else {
-          showToast('❌ 更新失败: ' + res.statusText);
+        } catch (err) {
+            showToast('❌ 更新失败: ' + err.message);
+        } finally {
+            saveBtn.disabled = false;
+            cancelBtn.disabled = false;
+            saveBtn.textContent = oldText;
         }
-      } catch (err) {
-        showToast('❌ 更新失败: ' + err.message);
-      } finally {
-        saveBtn.disabled = false;
-        cancelBtn.disabled = false;
-        saveBtn.textContent = oldText;
-      }
     }
 
     window.authorize = authorize;
@@ -2115,6 +2362,6 @@
     window.removeMember = removeMember;
     window.copyKanbanLink = copyKanbanLink;
     window.filterMembers = filterMembers;
-  </script>
+</script>
 </body>
 </html>

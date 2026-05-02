@@ -1,781 +1,850 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="32x32">
-  <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="192x192">
-  <title>选择网络 - ZTPanel</title>
-  <style>
-    :root {
-      --primary: #667eea;
-      --secondary: #764ba2;
-      --success: #48bb78;
-      --warning: #f6ad55;
-      --danger:  #f56565;
-      --dark: #2d3748;
-      --text: #1f2937;
-      --text-light: #718096;
-      --border: #e2e8f0;
-      --bg: #f5f7fa;
-      --surface: #ffffff;
-      --surface-2: #f7fafc;
-      --radius: 12px;
-      --radius-sm: 10px;
-      --radius-xs: 8px;
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-      --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.12);
-      --ring: 0 0 0 3px rgba(102, 126, 234, 0.22);
-      --transition: 150ms ease;
-      --container: 1200px;
-      --bg-img: url("https://www.zerotier.com/wp-content/uploads/2026/04/Globe-260323v01-DRAFT.png");
-    }
-
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body, h1, h2, h3, p { margin: 0; }
-    button { font: inherit; }
-
-    body {
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
-                   Arial, "Noto Sans", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      line-height: 1.45;
-      background-image: var(--bg-img);
-      background-repeat: no-repeat;
-      background-size: 680px auto;
-      background-position: right 22% top 55%;
-      background-attachment: fixed;
-    }
-
-    .container {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 1.5rem;
-      padding-left: max(1rem, env(safe-area-inset-left));
-      padding-right: max(1rem, env(safe-area-inset-right));
-      padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
-    }
-
-    /* ========== 头部布局 ========== */
-    .header {
-      display: grid;
-      grid-template-columns: auto 1fr auto auto;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-    }
-
-    .header-title {
-      font-size: clamp(1.4rem, 2.5vw, 2rem);
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-    }
-
-    .header-time {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.95rem;
-      white-space: nowrap;
-      font-weight: 600;
-      color: var(--text-light);
-      justify-self: end;  /* 靠右对齐 */
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    /* ========== 按钮样式 ========== */
-    .btn {
-      padding: 0.6rem 1.1rem;
-      border: 1px solid transparent;
-      border-radius: 10px;
-      font-weight: 800;
-      cursor: pointer;
-      font-size: 0.88rem;
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition), border-color var(--transition);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      min-height: 38px;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      white-space: nowrap;
-    }
-
-    .btn:focus-visible {
-      outline: none;
-      box-shadow: var(--ring);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12) inset;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: #fff;
-      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.28);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 26px rgba(102, 126, 234, 0.38);
-    }
-
-    .btn-outline {
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--dark);
-      border-color: var(--border);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      border-color: var(--primary);
-      color: var(--primary);
-      background: #fff;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-    }
-
-    /* ----- Error Msg ----- */
-    .error-msg {
-      display: none;
-      background: #fed7d7;
-      color: #c53030;
-      padding: 0.85rem 0.9rem;
-      border-radius: var(--radius-xs);
-      margin-bottom: 1rem;
-      border-left: 3px solid #c53030;
-      font-size: 0.9rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    /* ----- Loading & Error States ----- */
-    .loading-container, .error-container {
-      text-align: center;
-      padding: 2.4rem 1.2rem;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid var(--border);
-      border-top: 4px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1.2rem;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .error-icon { font-size: 2.3rem; margin-bottom: 0.5rem; opacity: 0.85; }
-    .error-title { color: var(--danger); font-weight: 900; margin-bottom: 0.6rem; }
-
-    /* ----- Network Grid ----- */
-    .network-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.2rem;
-    }
-
-    .network-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 1.3rem 1.25rem;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      transition: all var(--transition);
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      position: relative;
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    .network-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--primary);
-      box-shadow: var(--shadow-md);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 0.7rem;
-      min-width: 0;
-    }
-    .card-header.animate-in {
-      animation: fadeSlideIn 0.35s ease;
-    }
-
-    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-    .network-name {
-      font-size: 1.02rem;
-      font-weight: 950;
-      color: var(--dark);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
-    }
-
-    .network-id {
-      font-family: ui-monospace, SFMono-Regular, Consolas, Menlo, Monaco, "Liberation Mono", monospace;
-      font-size: 0.77rem;
-      background: #ebf4ff;
-      color: #3182ce;
-      padding: 0.12rem 0.38rem;
-      border-radius: 5px;
-      margin-top: 0.18rem;
-      display: inline-block;
-      opacity: 0.8;
-      letter-spacing: 0.1px;
-    }
-
-    .status-badge {
-      font-size: 0.7rem;
-      font-weight: 800;
-      padding: 0.14rem 0.7rem;
-      border-radius: 999px;
-      background: #ebf4ff;
-      color: #3182ce;
-      align-self: flex-start;
-      white-space: nowrap;
-    }
-
-    .status-badge.public {
-      background: #fff3cd;
-      color: #b7791f;
-    }
-
-    .network-description {
-      font-size: 0.88rem;
-      color: var(--text-light);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-height: 1.18em;
-      padding: 0 0.1rem;
-    }
-
-    /* Stats */
-    .stats-row {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-      background: var(--surface-2);
-      border-radius: var(--radius-xs);
-      border: 1px solid var(--border);
-      padding: 0.54rem 0.8rem;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.88rem;
-    }
-
-    .stat-item {
-      flex: 1;
-      min-width: 68px;
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 1.35rem;
-      font-weight: 950;
-      margin-bottom: 0.15em;
-      letter-spacing: 0.2px;
-      display: block;
-    }
-
-    .stat-value.success { color: var(--success); }
-    .stat-value.secondary { color: var(--secondary); }
-
-    .stat-label {
-      font-size: 0.76rem;
-      color: var(--text-light);
-      font-weight: 700;
-      margin-top: 0.12em;
-    }
-
-    /* Empty state */
-    .empty-state {
-      text-align: center;
-      padding: 2rem 1.2rem;
-      background: var(--surface);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-sm);
-      border: 1px dashed rgba(226, 232, 240, 0.9);
-    }
-
-    .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.55; }
-    .empty-text { color: var(--text-light); font-size: 0.92rem; font-weight: 800; }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      background: rgba(0, 0, 0, 0.86);
-      color: #fff;
-      padding: 0.8rem 1.15rem;
-      border-radius: 12px;
-      opacity: 0;
-      transition: opacity 220ms ease;
-      pointer-events: none;
-      z-index: 1000;
-      font-size: 0.92rem;
-      box-shadow: var(--shadow-md);
-      max-width: min(360px, calc(100vw - 2rem));
-      word-break: break-word;
-    }
-
-    .toast.show { opacity: 1; pointer-events: auto; }
-
-    /* ========== 响应式布局 ========== */
-    @media (max-width: 1280px) {
-      .header {
-        grid-template-columns: auto 1fr auto;
-        gap: 1rem;
-      }
-    }
-
-    @media (max-width: 640px) {
-      body {
-        background-image: none;
-      }
-
-      .container {
-        padding: 0.8rem;
-      }
-
-      .header {
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .header-title {
-        font-size: 1.25rem;
-        margin-bottom: 0.2rem;
-      }
-
-      .header-time {
-        font-size: 0.88rem;
-        order: 3;
-      }
-
-      .header-actions {
-        flex-direction: row;
-        width: 100%;
-        gap: 0.5rem;
-        order: 4;
-      }
-
-      .header-actions .btn {
-        flex: 1;
-        padding: 0.4rem 0.6rem;
-        font-size: 0.75rem;
-        min-height: 36px;
-        gap: 0.3rem;
-      }
-
-      .network-grid {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-      }
-
-      .network-card {
-        padding: 0.8rem;
-      }
-
-      .network-name {
-        font-size: 0.95rem;
-      }
-
-      .network-description {
-        font-size: 0.82rem;
-      }
-
-      .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-        padding: 0.45rem 0.6rem;
-      }
-
-      .stat-item {
-        min-width: 0;
-      }
-
-      .stat-value {
-        font-size: 1.1rem;
-      }
-
-      .stat-label {
-        font-size: 0.65rem;
-      }
-
-      .card-header {
-        gap: 0.5rem;
-      }
-
-      .status-badge {
-        font-size: 0.65rem;
-        padding: 0.1rem 0.55rem;
-      }
-
-      .network-id {
-        font-size: 0.72rem;
-        padding: 0.1rem 0.3rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 0.6rem;
-      }
-
-      .header-title {
-        font-size: 1.15rem;
-      }
-
-      .btn {
-        padding: 0.35rem 0.5rem;
-        font-size: 0.7rem;
-        min-height: 34px;
-      }
-
-      .header-actions .btn {
-        padding: 0.35rem 0.5rem;
-        font-size: 0.7rem;
-        min-height: 34px;
-      }
-
-      .network-card {
-        padding: 0.7rem;
-      }
-
-      .network-name {
-        font-size: 0.9rem;
-      }
-
-      .network-description {
-        font-size: 0.78rem;
-      }
-
-      .stats-row {
-        padding: 0.4rem 0.5rem;
-        gap: 0.5rem;
-      }
-
-      .stat-value {
-        font-size: 1rem;
-      }
-
-      .stat-label {
-        font-size: 0.62rem;
-      }
-
-      .network-id {
-        font-size: 0.68rem;
-      }
-
-      .status-badge {
-        font-size: 0.62rem;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .container {
-        padding: 0.5rem;
-      }
-
-      .header-title {
-        font-size: 1.1rem;
-        margin-bottom: 0.15rem;
-      }
-
-      .header-time {
-        font-size: 0.82rem;
-      }
-
-      .header-actions .btn {
-        padding: 0.3rem 0.4rem;
-        font-size: 0.65rem;
-        min-height: 32px;
-      }
-
-      .network-card {
-        padding: 0.6rem;
-      }
-
-      .network-name {
-        font-size: 0.88rem;
-      }
-
-      .network-description {
-        font-size: 0.75rem;
-      }
-
-      .stats-row {
-        padding: 0.35rem 0.4rem;
-        gap: 0.4rem;
-      }
-
-      .stat-value {
-        font-size: 0.95rem;
-      }
-
-      .stat-label {
-        font-size: 0.6rem;
-      }
-
-      .card-header {
-        gap: 0.4rem;
-      }
-
-      .network-id {
-        font-size: 0.65rem;
-        padding: 0.08rem 0.25rem;
-      }
-
-      .status-badge {
-        font-size: 0.6rem;
-        padding: 0.08rem 0.45rem;
-      }
-    }
-
-    /* Optional: Dark mode */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0b1220;
-        --surface: #0f172a;
-        --surface-2: #111c35;
-        --border: rgba(148, 163, 184, 0.22);
-        --dark: #e5e7eb;
-        --text: #e5e7eb;
-        --text-light: rgba(226, 232, 240, 0.7);
-        --shadow-sm: 0 2px 10px rgba(0,0,0,.35);
-        --shadow-md: 0 14px 34px rgba(0,0,0,.42);
-      }
-
-      body { color: var(--text); }
-      .btn-outline { background: rgba(15, 23, 42, 0.72); color: var(--text); }
-      .network-card, .empty-state { background: var(--surface); }
-      .stats-row { background: var(--surface-2); }
-      .toast { background: rgba(0,0,0,0.78); }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-    }
-
-    /* ===== Footer ===== */
-    .app-footer {
-      margin-top: 2rem;
-      padding: 1.2rem 1rem;
-      border-top: 1px solid var(--border);
-      opacity: 0;
-      transform: translateY(8px);
-      animation: footerFadeIn 0.6s ease forwards;
-    }
-
-    /* 淡入动画 */
-    @keyframes footerFadeIn {
-      to {
-        opacity: 0.75;
-        transform: none;
-      }
-    }
-
-    .app-footer:hover {
-      opacity: 1;
-    }
-
-    /* 布局 */
-    .footer-inner {
-      max-width: var(--container);
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.8rem;
-      flex-wrap: wrap;
-    }
-
-    /* 左侧 */
-    .footer-left {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-      color: var(--text-light);
-      font-weight: 700;
-    }
-
-    .footer-title {
-      color: var(--text);
-      font-weight: 900;
-    }
-
-    .footer-divider {
-      opacity: 0.5;
-    }
-
-    .footer-license {
-      opacity: 0.85;
-    }
-
-    /* 右侧 */
-    .footer-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--text-light);
-      text-decoration: none;
-      padding: 0.4rem 0.7rem;
-      border-radius: 8px;
-      transition: all 0.15s ease;
-    }
-
-    .footer-link:hover {
-      color: var(--primary);
-      background: var(--surface-2);
-      transform: translateY(-1px);
-    }
-
-    /* GitHub SVG */
-    .footer-icon svg {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.2s ease;
-    }
-
-    .footer-link:hover .footer-icon svg {
-      transform: scale(1.15);
-    }
-
-    /* ===== 响应式 ===== */
-    @media (max-width: 640px) {
-      .app-footer {
-        padding: 1rem 0.6rem;
-      }
-
-      .footer-inner {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 0.5rem;
-      }
-
-      .footer-left {
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      .footer-link {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    .flex-1-min-w-0 {
-      min-width: 0; /* 允许宽度压缩到 0 */
-      display: flex; /* 保持 flex 布局特性 */
-      flex-direction: column; /* 让子元素垂直排列 */
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="32x32">
+    <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="192x192">
+    <title>选择网络 - ZTPanel</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --warning: #f6ad55;
+            --danger: #f56565;
+            --dark: #2d3748;
+            --text: #1f2937;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --bg: #f5f7fa;
+            --surface: #ffffff;
+            --surface-2: #f7fafc;
+            --radius: 12px;
+            --radius-sm: 10px;
+            --radius-xs: 8px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.12);
+            --ring: 0 0 0 3px rgba(102, 126, 234, 0.22);
+            --transition: 150ms ease;
+            --container: 1200px;
+            --bg-img: url("https://www.zerotier.com/wp-content/uploads/2026/04/Globe-260323v01-DRAFT.png");
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body, h1, h2, h3, p {
+            margin: 0;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+            Arial, "Noto Sans", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.45;
+            background-image: var(--bg-img);
+            background-repeat: no-repeat;
+            background-size: 680px auto;
+            background-position: right 22% top 55%;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 1.5rem;
+            padding-left: max(1rem, env(safe-area-inset-left));
+            padding-right: max(1rem, env(safe-area-inset-right));
+            padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+        }
+
+        /* ========== 头部布局 ========== */
+        .header {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .header-title {
+            font-size: clamp(1.4rem, 2.5vw, 2rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+
+        .header-time {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            font-weight: 600;
+            color: var(--text-light);
+            justify-self: end; /* 靠右对齐 */
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* ========== 按钮样式 ========== */
+        .btn {
+            padding: 0.6rem 1.1rem;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.88rem;
+            transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition), border-color var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            min-height: 38px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .btn:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) inset;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.28);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px rgba(102, 126, 234, 0.38);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark);
+            border-color: var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        /* ----- Error Msg ----- */
+        .error-msg {
+            display: none;
+            background: #fed7d7;
+            color: #c53030;
+            padding: 0.85rem 0.9rem;
+            border-radius: var(--radius-xs);
+            margin-bottom: 1rem;
+            border-left: 3px solid #c53030;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ----- Loading & Error States ----- */
+        .loading-container, .error-container {
+            text-align: center;
+            padding: 2.4rem 1.2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.2rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-icon {
+            font-size: 2.3rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.85;
+        }
+
+        .error-title {
+            color: var(--danger);
+            font-weight: 900;
+            margin-bottom: 0.6rem;
+        }
+
+        /* ----- Network Grid ----- */
+        .network-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .network-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.3rem 1.25rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .network-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.7rem;
+            min-width: 0;
+        }
+
+        .card-header.animate-in {
+            animation: fadeSlideIn 0.35s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .network-name {
+            font-size: 1.02rem;
+            font-weight: 950;
+            color: var(--dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .network-id {
+            font-family: ui-monospace, SFMono-Regular, Consolas, Menlo, Monaco, "Liberation Mono", monospace;
+            font-size: 0.77rem;
+            background: #ebf4ff;
+            color: #3182ce;
+            padding: 0.12rem 0.38rem;
+            border-radius: 5px;
+            margin-top: 0.18rem;
+            display: inline-block;
+            opacity: 0.8;
+            letter-spacing: 0.1px;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.14rem 0.7rem;
+            border-radius: 999px;
+            background: #ebf4ff;
+            color: #3182ce;
+            align-self: flex-start;
+            white-space: nowrap;
+        }
+
+        .status-badge.public {
+            background: #fff3cd;
+            color: #b7791f;
+        }
+
+        .network-description {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 1.18em;
+            padding: 0 0.1rem;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            background: var(--surface-2);
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--border);
+            padding: 0.54rem 0.8rem;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+        }
+
+        .stat-item {
+            flex: 1;
+            min-width: 68px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.35rem;
+            font-weight: 950;
+            margin-bottom: 0.15em;
+            letter-spacing: 0.2px;
+            display: block;
+        }
+
+        .stat-value.success {
+            color: var(--success);
+        }
+
+        .stat-value.secondary {
+            color: var(--secondary);
+        }
+
+        .stat-label {
+            font-size: 0.76rem;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-top: 0.12em;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1.2rem;
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            border: 1px dashed rgba(226, 232, 240, 0.9);
+        }
+
+        .empty-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.55;
+        }
+
+        .empty-text {
+            color: var(--text-light);
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: rgba(0, 0, 0, 0.86);
+            color: #fff;
+            padding: 0.8rem 1.15rem;
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 220ms ease;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 0.92rem;
+            box-shadow: var(--shadow-md);
+            max-width: min(360px, calc(100vw - 2rem));
+            word-break: break-word;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ========== 响应式布局 ========== */
+        @media (max-width: 1280px) {
+            .header {
+                grid-template-columns: auto 1fr auto;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                background-image: none;
+            }
+
+            .container {
+                padding: 0.8rem;
+            }
+
+            .header {
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .header-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.2rem;
+            }
+
+            .header-time {
+                font-size: 0.88rem;
+                order: 3;
+            }
+
+            .header-actions {
+                flex-direction: row;
+                width: 100%;
+                gap: 0.5rem;
+                order: 4;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+                padding: 0.4rem 0.6rem;
+                font-size: 0.75rem;
+                min-height: 36px;
+                gap: 0.3rem;
+            }
+
+            .network-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .network-card {
+                padding: 0.8rem;
+            }
+
+            .network-name {
+                font-size: 0.95rem;
+            }
+
+            .network-description {
+                font-size: 0.82rem;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 0.45rem 0.6rem;
+            }
+
+            .stat-item {
+                min-width: 0;
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .stat-label {
+                font-size: 0.65rem;
+            }
+
+            .card-header {
+                gap: 0.5rem;
+            }
+
+            .status-badge {
+                font-size: 0.65rem;
+                padding: 0.1rem 0.55rem;
+            }
+
+            .network-id {
+                font-size: 0.72rem;
+                padding: 0.1rem 0.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.6rem;
+            }
+
+            .header-title {
+                font-size: 1.15rem;
+            }
+
+            .btn {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.7rem;
+                min-height: 34px;
+            }
+
+            .header-actions .btn {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.7rem;
+                min-height: 34px;
+            }
+
+            .network-card {
+                padding: 0.7rem;
+            }
+
+            .network-name {
+                font-size: 0.9rem;
+            }
+
+            .network-description {
+                font-size: 0.78rem;
+            }
+
+            .stats-row {
+                padding: 0.4rem 0.5rem;
+                gap: 0.5rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+
+            .stat-label {
+                font-size: 0.62rem;
+            }
+
+            .network-id {
+                font-size: 0.68rem;
+            }
+
+            .status-badge {
+                font-size: 0.62rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .header-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.15rem;
+            }
+
+            .header-time {
+                font-size: 0.82rem;
+            }
+
+            .header-actions .btn {
+                padding: 0.3rem 0.4rem;
+                font-size: 0.65rem;
+                min-height: 32px;
+            }
+
+            .network-card {
+                padding: 0.6rem;
+            }
+
+            .network-name {
+                font-size: 0.88rem;
+            }
+
+            .network-description {
+                font-size: 0.75rem;
+            }
+
+            .stats-row {
+                padding: 0.35rem 0.4rem;
+                gap: 0.4rem;
+            }
+
+            .stat-value {
+                font-size: 0.95rem;
+            }
+
+            .stat-label {
+                font-size: 0.6rem;
+            }
+
+            .card-header {
+                gap: 0.4rem;
+            }
+
+            .network-id {
+                font-size: 0.65rem;
+                padding: 0.08rem 0.25rem;
+            }
+
+            .status-badge {
+                font-size: 0.6rem;
+                padding: 0.08rem 0.45rem;
+            }
+        }
+
+        /* Optional: Dark mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0b1220;
+                --surface: #0f172a;
+                --surface-2: #111c35;
+                --border: rgba(148, 163, 184, 0.22);
+                --dark: #e5e7eb;
+                --text: #e5e7eb;
+                --text-light: rgba(226, 232, 240, 0.7);
+                --shadow-sm: 0 2px 10px rgba(0, 0, 0, .35);
+                --shadow-md: 0 14px 34px rgba(0, 0, 0, .42);
+            }
+
+            body {
+                color: var(--text);
+            }
+
+            .btn-outline {
+                background: rgba(15, 23, 42, 0.72);
+                color: var(--text);
+            }
+
+            .network-card, .empty-state {
+                background: var(--surface);
+            }
+
+            .stats-row {
+                background: var(--surface-2);
+            }
+
+            .toast {
+                background: rgba(0, 0, 0, 0.78);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* ===== Footer ===== */
+        .app-footer {
+            margin-top: 2rem;
+            padding: 1.2rem 1rem;
+            border-top: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(8px);
+            animation: footerFadeIn 0.6s ease forwards;
+        }
+
+        /* 淡入动画 */
+        @keyframes footerFadeIn {
+            to {
+                opacity: 0.75;
+                transform: none;
+            }
+        }
+
+        .app-footer:hover {
+            opacity: 1;
+        }
+
+        /* 布局 */
+        .footer-inner {
+            max-width: var(--container);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        /* 左侧 */
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        .footer-title {
+            color: var(--text);
+            font-weight: 900;
+        }
+
+        .footer-divider {
+            opacity: 0.5;
+        }
+
+        .footer-license {
+            opacity: 0.85;
+        }
+
+        /* 右侧 */
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+            background: var(--surface-2);
+            transform: translateY(-1px);
+        }
+
+        /* GitHub SVG */
+        .footer-icon svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .footer-link:hover .footer-icon svg {
+            transform: scale(1.15);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 640px) {
+            .app-footer {
+                padding: 1rem 0.6rem;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .footer-left {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .footer-link {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .flex-1-min-w-0 {
+            min-width: 0; /* 允许宽度压缩到 0 */
+            display: flex; /* 保持 flex 布局特性 */
+            flex-direction: column; /* 让子元素垂直排列 */
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
+<div class="container">
     <!-- 头部 -->
     <div class="header">
-      <div class="header-title">ZTPanel</div>
-      <div class="header-time">🕐 <span id="refresh-time">--:--:--</span></div>
-      <div class="header-actions">
-        <button class="btn btn-outline" onclick="copyKanbanLink()" title="复制链接">🔗 复制链接</button>
-        <button class="btn btn-primary" id="refresh-button" title="刷新数据">🔄 刷新数据</button>
-      </div>
+        <div class="header-title">ZTPanel</div>
+        <div class="header-time">🕐 <span id="refresh-time">--:--:--</span></div>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="copyKanbanLink()" title="复制链接">🔗 复制链接</button>
+            <button class="btn btn-primary" id="refresh-button" title="刷新数据">🔄 刷新数据</button>
+        </div>
     </div>
 
     <div id="error-message" class="error-msg"></div>
 
     <main id="mainContent">
-      <div class="loading-container" id="loadingState">
-        <div class="spinner"></div>
-        <p>正在连接 ZeroTier 云端...</p>
-      </div>
-      <div id="errorState" style="display: none;" class="error-container">
-        <div class="error-icon">⚠️</div>
-        <h2 class="error-title" id="errorTitle">加载失败</h2>
-        <p id="errorMessage">未知错误</p>
-      </div>
-      <div id="networkGrid" class="network-grid"></div>
+        <div class="loading-container" id="loadingState">
+            <div class="spinner"></div>
+            <p>正在连接 ZeroTier 云端...</p>
+        </div>
+        <div id="errorState" style="display: none;" class="error-container">
+            <div class="error-icon">⚠️</div>
+            <h2 class="error-title" id="errorTitle">加载失败</h2>
+            <p id="errorMessage">未知错误</p>
+        </div>
+        <div id="networkGrid" class="network-grid"></div>
     </main>
 
 
     <footer class="app-footer">
-      <div class="footer-inner">
+        <div class="footer-inner">
 
-        <div class="footer-left">
-          <span class="footer-title">ZTPanel</span>
-          <span class="footer-divider">·</span>
-          <span class="footer-license" id="footer-license">
+            <div class="footer-left">
+                <span class="footer-title">ZTPanel</span>
+                <span class="footer-divider">·</span>
+                <span class="footer-license" id="footer-license">
         MIT License
       </span>
-        </div>
+            </div>
 
-        <div class="footer-right">
-          <a href="https://github.com/Zakkoree/ZTPanel" target="_blank" class="footer-link">
+            <div class="footer-right">
+                <a href="https://github.com/Zakkoree/ZTPanel" target="_blank" class="footer-link">
         <span class="footer-icon">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 .5C5.65.5.75 5.4.75 11.75c0 5.1 3.3 9.4 7.9 10.95.6.1.8-.25.8-.55v-2.15c-3.2.7-3.9-1.55-3.9-1.55-.55-1.35-1.35-1.7-1.35-1.7-1.1-.75.1-.75.1-.75 1.2.1 1.85 1.25 1.85 1.25 1.1 1.85 2.9 1.3 3.6 1 .1-.8.4-1.3.75-1.6-2.55-.3-5.25-1.3-5.25-5.7 0-1.25.45-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.15 0 0 1-.3 3.25 1.2a11.3 11.3 0 0 1 5.9 0c2.25-1.5 3.25-1.2 3.25-1.2.6 1.65.2 2.85.1 3.15.75.8 1.2 1.85 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.45.4.8 1.1.8 2.2v3.25c0 .3.2.65.8.55 4.6-1.55 7.9-5.85 7.9-10.95C23.25 5.4 18.35.5 12 .5z"/>
           </svg>
         </span>
-            GitHub
-          </a>
+                    GitHub
+                </a>
+            </div>
+
         </div>
-
-      </div>
     </footer>
-  </div>
+</div>
 
 
+<div id="toast" class="toast"></div>
 
-  <div id="toast" class="toast"></div>
-
-  <script>
+<script>
     // 获取 URL 中的 token 参数（如果有）
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
@@ -790,100 +859,100 @@
 
     /* ===== 自动年份 ===== */
     (function () {
-      const el = document.getElementById('footer-license');
-      if (el) {
-        const year = new Date().getFullYear();
-        el.textContent = `MIT License © ${year}`;
-      }
+        const el = document.getElementById('footer-license');
+        if (el) {
+            const year = new Date().getFullYear();
+            el.textContent = `MIT License © ${year}`;
+        }
     })();
 
     function showToast(msg) {
-      let toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2300);
+        let toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2300);
     }
 
     function updateTime() {
-      const now = new Date();
-      const el = document.getElementById('refresh-time');
-      if (el) {
-        el.textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      }
+        const now = new Date();
+        const el = document.getElementById('refresh-time');
+        if (el) {
+            el.textContent = now.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+        }
     }
 
     function copyKanbanLink() {
-      const link = window.location.href;
-      navigator.clipboard.writeText(link).then(() => {
-        showToast('✅ 已复制');
-        if (!localStorage.getItem('notice_shown')) {
-          setTimeout(() => alert('⚠️ 安全提示：链接包含访问令牌，请勿公开分享！'), 500);
-          localStorage.setItem('notice_shown', '1');
-        }
-      }).catch(() => showToast('❌ 复制失败'));
+        const link = window.location.href;
+        navigator.clipboard.writeText(link).then(() => {
+            showToast('✅ 已复制');
+            if (!localStorage.getItem('notice_shown')) {
+                setTimeout(() => alert('⚠️ 安全提示：链接包含访问令牌，请勿公开分享！'), 500);
+                localStorage.setItem('notice_shown', '1');
+            }
+        }).catch(() => showToast('❌ 复制失败'));
     }
 
     document.getElementById('refresh-button').addEventListener('click', () => {
-      const btn = document.getElementById('refresh-button');
-      btn.disabled = true;
-      btn.textContent = '⏳ 刷新中...';
-      showToast('🔄 刷新中...');
-      init().finally(() => {
-        btn.disabled = false;
-        btn.textContent = '🔄 刷新数据';
-      });
+        const btn = document.getElementById('refresh-button');
+        btn.disabled = true;
+        btn.textContent = '⏳ 刷新中...';
+        showToast('🔄 刷新中...');
+        init().finally(() => {
+            btn.disabled = false;
+            btn.textContent = '🔄 刷新数据';
+        });
     });
 
     // 初始化
     async function init() {
-      if (!token) {
-        window.location.href = '/index';
-        return;
-      }
-      updateTime();
-      try {
-        const response = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network')}`);
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error(`无效访问令牌`);
-          } else {
-            throw new Error(`API Error: ${response.statusText}`);
-          }
+        if (!token) {
+            window.location.href = '/index';
+            return;
         }
-        const data = await response.json();
-        allNetworks = data;
-        renderNetworks(data);
-      } catch (err) {
-        showError('连接失败', `${err.message}`);
-      } finally {
-        loadingState.style.display = 'none';
-      }
+        updateTime();
+        try {
+            const response = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network')}`);
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error(`无效访问令牌`);
+                } else {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+            }
+            const data = await response.json();
+            allNetworks = data;
+            renderNetworks(data);
+        } catch (err) {
+            showError('连接失败', `${err.message}`);
+        } finally {
+            loadingState.style.display = 'none';
+        }
     }
 
     // 渲染网络列表
     function renderNetworks(networks) {
-      networkGrid.innerHTML = '';
-      if (!networks.length) {
-        networkGrid.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div><div class="empty-text">没有找到网络</div></div>`;
-        return;
-      }
-      networks.forEach(net => {
-        const config = net.config || {};
-        const card = document.createElement('div');
-        card.className = 'network-card';
-        // 跳转逻辑
-        card.onclick = () => {
-          window.location.href = `dashboard?token=${encodeURIComponent(token)}&net_id=${encodeURIComponent(net.id)}`;
-        };
-        const description = net.description || '暂无描述';
-        const isPrivate = config.private === false ? '公开' : '私有';
-        const statusClass = config.private === false ? 'public' : '';
-        const memberCount = net.totalMemberCount || 0;
-        const authorizedMemberCount = net.authorizedMemberCount || 0;
-        const onlineMemberCount = net.onlineMemberCount || 0;
+        networkGrid.innerHTML = '';
+        if (!networks.length) {
+            networkGrid.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div><div class="empty-text">没有找到网络</div></div>`;
+            return;
+        }
+        networks.forEach(net => {
+            const config = net.config || {};
+            const card = document.createElement('div');
+            card.className = 'network-card';
+            // 跳转逻辑
+            card.onclick = () => {
+                window.location.href = `dashboard?token=${encodeURIComponent(token)}&net_id=${encodeURIComponent(net.id)}`;
+            };
+            const description = net.description || '暂无描述';
+            const isPrivate = config.private === false ? '公开' : '私有';
+            const statusClass = config.private === false ? 'public' : '';
+            const memberCount = net.totalMemberCount || 0;
+            const authorizedMemberCount = net.authorizedMemberCount || 0;
+            const onlineMemberCount = net.onlineMemberCount || 0;
 
-        card.innerHTML = `
+            card.innerHTML = `
           <div class="card-header ${isFirstRender ? 'animate-in' : ''}">
             <div class="flex-1-min-w-0">
               <div class="network-name" title="${config.name || '未命名'}">${config.name || '未命名'}</div>
@@ -907,20 +976,20 @@
             </div>
           </div>
         `;
-        networkGrid.appendChild(card);
-        if (isFirstRender) {
-          setTimeout(() => {
-            isFirstRender = false;
-          }, 400); // 等动画结束
-        }
-      });
+            networkGrid.appendChild(card);
+            if (isFirstRender) {
+                setTimeout(() => {
+                    isFirstRender = false;
+                }, 400); // 等动画结束
+            }
+        });
     }
 
     function showError(title, msg) {
-      loadingState.style.display = 'none';
-      errorState.style.display = 'block';
-      errorTitle.textContent = title;
-      errorMessage.textContent = msg;
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        errorTitle.textContent = title;
+        errorMessage.textContent = msg;
     }
 
     // 启动
@@ -929,6 +998,6 @@
     setInterval(updateTime, 60000);
 
     window.copyKanbanLink = copyKanbanLink;
-  </script>
+</script>
 </body>
 </html>
