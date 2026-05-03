@@ -58,7 +58,7 @@ pnpm run deploy
 ## 📖 常见问题
 
 **Q1：会不会泄露我的 ZeroTier Token？**  
-A：仅本地使用 Token 调 ZeroTier API，不做任何存储。 <br> 
+A：仅使用 Token 调 ZeroTier API，不做任何存储。 <br> 
 ps：使用url传参方式，你的浏览器浏览会有记录和开启Workers日志会有记录
 
 **Q2：Token 怎么获取？**  
