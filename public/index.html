@@ -445,6 +445,93 @@
                 justify-content: center;
             }
         }
+
+        /* ===== 可折叠高级设置（details/summary） ===== */
+        .advanced {
+            margin-top: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: rgba(248, 249, 250, 0.85);
+            overflow: hidden;
+        }
+
+        .advanced summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 0.85rem 1rem;
+            font-weight: 800;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .advanced summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .advanced summary .summary-left {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .advanced summary .chev {
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid #667eea;
+            border-bottom: 2px solid #667eea;
+            transform: rotate(45deg);
+            transition: transform 0.2s ease;
+            opacity: 0.9;
+        }
+
+        .advanced[open] summary .chev {
+            transform: rotate(-135deg);
+        }
+
+        .advanced .advanced-body {
+            padding: 0.25rem 1rem 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .advanced .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .advanced .two-col {
+            display: grid;
+            grid-template-columns: 1fr 140px; /* 地址宽，端口窄 */
+            gap: 0.75rem;
+        }
+
+
+        /* ✅ 允许 grid 子项真正缩小 */
+        .advanced .two-col > * {
+            min-width: 0;
+        }
+
+        /* ✅ input 在 grid 中不撑爆 */
+        .advanced input {
+            width: 100%;
+            max-width: 100%;
+        }
+
+
+        @media (max-width: 480px) {
+
+            .advanced .two-col {
+                grid-template-columns: 1fr 86px;
+                gap: 0.5rem;
+            }
+
+
+            .advanced .form-hint {
+                display: none; /* ✅ 移动端隐藏 hint，减少高度 */
+            }
+
+        }
     </style>
 </head>
 <body>
@@ -454,7 +541,7 @@
             <div class="logo"><img src="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" alt="logo">
             </div>
             <h1>ZTPanel</h1>
-            <p>ZeroTier 网络可视化管理</p>
+            <!--            <p>ZeroTier 网络管理</p>-->
         </div>
 
         <div id="error-message" class="error-message"></div>
@@ -466,7 +553,41 @@
                 <small class="form-hint">在 <a href="https://my.zerotier.com/account#tokens"
                                                target="_blank">令牌页面</a> 获取</small>
             </div>
+            <details class="advanced" id="advanced">
+                <summary>
+                    <span class="summary-left">⚙️ 客户端设置（可选）</span>
+                    <i class="chev" aria-hidden="true"></i>
+                </summary>
 
+                <div class="advanced-body">
+
+                    <!-- 地址 + 端口 同一行 -->
+                    <div class="two-col">
+                        <div class="form-group">
+                            <label for="svcHost">🌐 客户端地址</label>
+                            <input type="text" id="svcHost" placeholder="127.0.0.1" autocomplete="off">
+                            <!--                            <small class="form-hint">默认 localhost</small>-->
+                        </div>
+
+                        <div class="form-group">
+                            <label for="svcPort">🔌 端口</label>
+                            <input type="text" id="svcPort" inputmode="numeric" placeholder="9993" autocomplete="off"
+                                   maxlength="5">
+                            <!--                            <small class="form-hint">默认9993</small>-->
+                        </div>
+                    </div>
+
+                    <!-- 密钥 单独一行 -->
+                    <div class="form-group">
+                        <!--                        <label for="svcKey">🧩 客户端令牌</label>-->
+                        <input type="password" id="svcKey" placeholder="输入客户端访问令牌" autocomplete="off">
+                        <small class="form-hint">客户端令牌获取方式查看 <a
+                                href="https://docs.zerotier.com/api/client/#description/introduction"
+                                target="_blank">官方文档</a> </small>
+                    </div>
+
+                </div>
+            </details>
             <button type="submit" class="submit-button">开始使用</button>
         </form>
     </div>
@@ -508,6 +629,26 @@
     })();
     const tokenInput = document.getElementById('token');
 
+    const svcHostInput = document.getElementById('svcHost');
+    const svcPortInput = document.getElementById('svcPort');
+    const svcKeyInput = document.getElementById('svcKey');
+
+
+    [svcHostInput, svcKeyInput].forEach(el => {
+        if (!el) return;
+        el.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\s/g, '');
+        });
+    });
+
+
+    if (svcPortInput) {
+        svcPortInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^\d]/g, '').slice(0, 5);
+        });
+    }
+
+
     tokenInput.addEventListener('input', (e) => {
         e.target.value = e.target.value.replace(/\s/g, '');
     });
@@ -516,6 +657,12 @@
         e.preventDefault();
         const err = document.getElementById('error-message');
         const btn = document.querySelector('.submit-button');
+
+
+        const svcHost = (svcHostInput?.value || 'localhost').trim();
+        const svcPort = (svcPortInput?.value || '9993').trim();
+        const svcKey = (svcKeyInput?.value || '').trim();
+
 
         err.classList.remove('show');
 
@@ -537,7 +684,23 @@
             if (!d.user) {
                 throw new Error(`无效访问令牌！`);
             }
-            window.location.href = `/networks?token=${encodeURIComponent(token)}`;
+            let url = '/networks?token=' + encodeURIComponent(token);
+            if (svcKey) {
+                console.log(svcKey)
+                const rc = await fetch(`/api?token=${encodeURIComponent(svcKey)}&path=${encodeURIComponent('/status')}&server=${encodeURIComponent(svcHost + ':' + svcPort)}`);
+                if (!rc.ok) {
+                    if (rc.status === 401) {
+                        throw new Error('无效客户端访问令牌');
+                    } else {
+                        throw new Error('客户端连接失败，' + rc.statusText);
+                    }
+                }
+                url += '&clientToken=' + encodeURIComponent(svcKey);
+                if (!((svcHost === 'localhost' || svcHost === '127.0.0.1') && svcPort === '9993')) {
+                    url += '&server=' + encodeURIComponent(svcHost + ':' + svcPort);
+                }
+            }
+            window.location.href = url;
         } catch (e) {
             console.error('❌ 验证失败:', e);
             err.textContent = '❌ ' + e.message;

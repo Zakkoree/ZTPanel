@@ -239,7 +239,7 @@
             -webkit-tap-highlight-color: transparent;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.5rem;
             position: relative;
             min-width: 0;
             overflow: hidden;
@@ -254,7 +254,7 @@
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             gap: 0.7rem;
             min-width: 0;
         }
@@ -277,11 +277,20 @@
         .network-name {
             font-size: 1.02rem;
             font-weight: 950;
+            margin-right: auto;
             color: var(--dark);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             min-width: 0;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center; /* 垂直居中对齐 */
+            gap: 8px; /* ID 和 描述 之间的间距 */
+            flex-grow: 1; /* 占据中间剩余空间 */
+            min-width: 0; /* 关键：允许内容在空间不足时收缩 */
         }
 
         .network-id {
@@ -291,10 +300,12 @@
             color: #3182ce;
             padding: 0.12rem 0.38rem;
             border-radius: 5px;
-            margin-top: 0.18rem;
             display: inline-block;
+            /*margin-top: -0.5rem;*/
             opacity: 0.8;
             letter-spacing: 0.1px;
+            align-self: flex-start; /* 强制换行并靠左对齐 (Flex布局专用) */
+            width: auto;
         }
 
         .status-badge {
@@ -304,8 +315,12 @@
             border-radius: 999px;
             background: #ebf4ff;
             color: #3182ce;
-            align-self: flex-start;
-            white-space: nowrap;
+            white-space: nowrap; /* 禁止文字换行，防止变成两行导致变形 */
+            flex-shrink: 0; /* 禁止被父容器压缩，保持固有宽度 */
+            display: inline-flex; /* 使用弹性盒子，确保文字在胶囊内绝对居中 */
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            line-height: 1; /* 修正行高，防止高度被撑大 */
         }
 
         .status-badge.public {
@@ -410,6 +425,139 @@
         .toast.show {
             opacity: 1;
             pointer-events: auto;
+        }
+
+        .edit-mask {
+            position: fixed;
+            z-index: 9999;
+            inset: 0;
+            background: rgba(30, 32, 42, 0.32);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overscroll-behavior: contain;
+        }
+
+        .edit-panel {
+            background: var(--surface, #fff);
+            border-radius: 16px;
+            box-shadow: 0 12px 48px 0 rgba(20, 34, 68, 0.13);
+            padding: 2rem 2rem 1.2rem 2rem;
+            min-width: 290px;
+            width: 100%;
+            max-width: 380px;
+            animation: slideInPanel .25s;
+            position: relative;
+        }
+
+        @keyframes slideInPanel {
+            0% {
+                transform: translateY(48px);
+                opacity: 0;
+            }
+            100% {
+                transform: none;
+                opacity: 1;
+            }
+        }
+
+        .edit-panel-title {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary, #667eea);
+            text-align: center;
+        }
+
+        .edit-panel-nodeId {
+            margin: 0 0 1.2rem 0;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--text-light, #667eea);
+            text-align: center;
+        }
+
+        .edit-form-group {
+            margin-bottom: 1.15rem;
+        }
+
+        .edit-form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .edit-form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border, #e2e8f0);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--surface-2, #f7fafc);
+            transition: border 0.25s;
+            outline: none;
+        }
+
+        .edit-form-group input:focus {
+            border-color: var(--primary, #667eea);
+            background: #fff;
+        }
+
+        .edit-form-group input[readonly] {
+            background: #f1f5f9;
+            color: #aaa;
+        }
+
+        .edit-form-action {
+            display: flex;
+            gap: 0.9rem;
+            justify-content: flex-end;
+            margin-top: 1.3rem;
+        }
+
+        .spinner1 {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border: 2px solid #fff;
+            border-top: 2px solid var(--primary, #667eea);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: -0.15em;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .edit-panel {
+                min-width: 0;
+                padding: 1.2rem 0.8rem 0.8rem 0.8rem;
+                border-radius: 11px;
+                max-width: 99vw;
+            }
+
+            .edit-panel-title {
+                font-size: 1.05rem;
+            }
+
+            .edit-panel-nodeId {
+                font-size: 0.9rem;
+            }
+
+            .edit-form-group input {
+                padding: 0.6rem 0.7rem;
+                font-size: 1rem;
+            }
+
+            .edit-form-action {
+                gap: 0.6rem;
+            }
         }
 
         /* ========== 响应式布局 ========== */
@@ -659,6 +807,8 @@
             .toast {
                 background: rgba(0, 0, 0, 0.78);
             }
+
+
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -785,6 +935,136 @@
             display: flex; /* 保持 flex 布局特性 */
             flex-direction: column; /* 让子元素垂直排列 */
         }
+
+        /* Member menu */
+        .member-menu {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .menu-trigger {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 950;
+            font-size: 16px;
+            line-height: 1;
+            color: var(--text-light);
+            transition: transform var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .menu-trigger:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .menu-trigger:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        .menu-panel {
+            position: absolute;
+            top: 38px;
+            right: 0;
+            width: 160px;
+            max-width: min(180px, 80vw);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            z-index: 50;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity var(--transition), transform var(--transition);
+        }
+
+        .member-menu.open .menu-panel {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .menu-item {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.84rem;
+            font-weight: 950;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 38px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .menu-item:hover {
+            background: var(--surface-2);
+        }
+
+        .menu-item:focus-visible {
+            outline: none;
+            box-shadow: inset var(--ring);
+        }
+
+        .menu-item.danger {
+            color: #e53e3e;
+        }
+
+        .menu-sep {
+            height: 1px;
+            background: var(--border);
+        }
+
+        #pending-section {
+            /*display: block; */
+            margin-top: 2rem;
+            /*padding: 1rem;*/
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .client-net.success {
+            color: var(--success);
+        }
+
+        .client-net.warning {
+            color: var(--warning);
+        }
+
+        .client-net.danger {
+            color: var(--danger);
+        }
     </style>
 </head>
 <body>
@@ -801,7 +1081,7 @@
 
     <div id="error-message" class="error-msg"></div>
 
-    <main id="mainContent">
+    <div id="mainContent">
         <div class="loading-container" id="loadingState">
             <div class="spinner"></div>
             <p>正在连接 ZeroTier 云端...</p>
@@ -812,7 +1092,24 @@
             <p id="errorMessage">未知错误</p>
         </div>
         <div id="networkGrid" class="network-grid"></div>
-    </main>
+
+    </div>
+
+    <div id="pending-section" hidden="hidden">
+        <div class="section-header">
+            <div>
+                <span class="section-title"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                 stroke-width="2.35" stroke-linecap="round" stroke-linejoin="round"
+                                                 class="lucide lucide-circle-alert ml-1" aria-hidden="true"><circle
+                        cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12"
+                                                                                                          x2="12.01"
+                                                                                                          y1="16"
+                                                                                                          y2="16"></line></svg> 客户端连接的未知网络</span>
+            </div>
+        </div>
+        <div id="networkUnknown" class="network-grid"></div>
+    </div>
 
 
     <footer class="app-footer">
@@ -841,14 +1138,41 @@
     </footer>
 </div>
 
+<!-- 编辑成员弹窗 -->
+<div id="edit-panel-mask" class="edit-mask" style="display:none;">
+    <div class="edit-panel">
+        <form id="edit-form" autocomplete="off">
+            <h2 class="edit-panel-title">编辑网络信息</h2>
+            <h1 class="edit-panel-nodeId" id="edit-panel-nodeId"></h1>
+            <input type="hidden" id="edit-nodeId"/>
 
+            <div class="edit-form-group">
+                <label for="edit-name">名称</label>
+                <input id="edit-name" maxlength="20"/>
+            </div>
+            <div class="edit-form-group">
+                <label for="edit-desc">备注</label>
+                <input id="edit-desc" maxlength="64"/>
+            </div>
+            <div class="edit-form-action">
+                <button type="button" class="btn btn-outline" id="edit-cancel">取消</button>
+                <button type="submit" class="btn btn-primary" id="edit-save"><span class="save-text">保存</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
 <div id="toast" class="toast"></div>
 
 <script>
     // 获取 URL 中的 token 参数（如果有）
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
+    const server = params.get('server');
+    const clientToken = params.get('clientToken');
     const networkGrid = document.getElementById('networkGrid');
+    const networkUnknown = document.getElementById('networkUnknown');
     const loadingState = document.getElementById('loadingState');
     const errorState = document.getElementById('errorState');
     const errorTitle = document.getElementById('errorTitle');
@@ -856,6 +1180,9 @@
 
     let isFirstRender = true;
     let allNetworks = [];
+    let clientNetworks = [];
+    let clientNetworksFilter = new Set();
+    let client = false;
 
     /* ===== 自动年份 ===== */
     (function () {
@@ -865,6 +1192,29 @@
             el.textContent = `MIT License © ${year}`;
         }
     })();
+
+    function closeAllMemberMenus() {
+        document.querySelectorAll('.member-menu.open').forEach(m => m.classList.remove('open'));
+    }
+
+    function toggleMemberMenu(e, id) {
+        e.stopPropagation();
+        const menu = document.querySelector(`.member-menu[data-menu-for="${id}"]`);
+        if (!menu) return;
+
+        const isOpen = menu.classList.contains('open');
+        closeAllMemberMenus();
+        if (!isOpen) menu.classList.add('open');
+    }
+
+    document.addEventListener('click', () => closeAllMemberMenus());
+
+    document.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape') closeAllMemberMenus();
+    });
+
+    window.toggleMemberMenu = toggleMemberMenu;
+    window.closeAllMemberMenus = closeAllMemberMenus;
 
     function showToast(msg) {
         let toast = document.getElementById('toast');
@@ -920,9 +1270,27 @@
                     throw new Error(`API Error: ${response.statusText}`);
                 }
             }
+
+
             const data = await response.json();
+
+            if (clientToken) {
+                const clientResponse = await fetch(`/api?token=${encodeURIComponent(clientToken)}&path=${encodeURIComponent('/network')}&server=${encodeURIComponent(server || 'localhost:9993')}`);
+
+                if (!clientResponse.ok) {
+                    if (clientResponse.status === 401) {
+                        showToast('❌ 客户端: 无效访问令牌');
+                    } else {
+                        showToast('❌ 客户端连接失败: ' + clientResponse.statusText);
+                    }
+                } else {
+                    client = true;
+                    clientNetworks = await clientResponse.json();
+                }
+            }
+
             allNetworks = data;
-            renderNetworks(data);
+            renderNetworks(data, clientNetworks);
         } catch (err) {
             showError('连接失败', `${err.message}`);
         } finally {
@@ -931,51 +1299,106 @@
     }
 
     // 渲染网络列表
-    function renderNetworks(networks) {
+    function renderNetworks(networks, clientNetworks) {
         networkGrid.innerHTML = '';
         if (!networks.length) {
-            networkGrid.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div><div class="empty-text">没有找到网络</div></div>`;
-            return;
+            networkGrid.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div><div class="empty-text">云端没有找到网络</div></div>`;
         }
+
         networks.forEach(net => {
             const config = net.config || {};
             const card = document.createElement('div');
             card.className = 'network-card';
             // 跳转逻辑
             card.onclick = () => {
-                window.location.href = `dashboard?token=${encodeURIComponent(token)}&net_id=${encodeURIComponent(net.id)}`;
+                window.location.href = `dashboard?token=${encodeURIComponent(token)}&net_id=${encodeURIComponent(net.id)}${clientToken ? '&clientToken=' + clientToken : ''}${server ? '&server=' + server : ''}`;
             };
-            const description = net.description || '暂无描述';
+            const description = net.description || '';
             const isPrivate = config.private === false ? '公开' : '私有';
             const statusClass = config.private === false ? 'public' : '';
             const memberCount = net.totalMemberCount || 0;
             const authorizedMemberCount = net.authorizedMemberCount || 0;
             const onlineMemberCount = net.onlineMemberCount || 0;
+            let clientNetHtml = '';
+            let clientMenuHtml = '';
+            if (client) {//warning danger
+                clientNetworks.some(e => {
+                    if (e.id === net.id) {//ACCESS_DENIED OK  REQUESTING_CONFIGURATION
+                        let ff = 'danger';
+                        let text = e.status;
+                        if (e.status === 'OK') {
+                            ff = 'success';
+                            text = '连接正常';
+                        } else if (e.status === 'ACCESS_DENIED') {
+                            ff = 'warning';
+                            text = '待授权';
+                        }
+                        clientNetHtml = `<span class="client-net ${ff}" title="${text}">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4.5 10.5C9.5 6 14.5 6 19.5 10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  <path d="M7.5 13.5C10.5 11 13.5 11 16.5 13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="12" cy="17" r="1.5" fill="currentColor" />
+</svg>
+</span>`;
+                        clientNetworksFilter.add(e.id);
+                        return true;
+                    }
+                    return false;
+                })
+                clientMenuHtml = `<div class="menu-sep"></div>
+                <button class="menu-item ${clientNetHtml ? 'danger' : ''}" onclick="event.stopPropagation(); joinOrLeaveNet('${net.id}', ${(!clientNetHtml)}); closeAllMemberMenus();">
+                  ${clientNetHtml ? '🚪 离开网络' : '🔗️ 加入网络'}
+                </button>`;
+            }
 
             card.innerHTML = `
-          <div class="card-header ${isFirstRender ? 'animate-in' : ''}">
-            <div class="flex-none min-w-0">
-              <div class="network-name" title="${config.name || '未命名'}">${config.name || '未命名'}</div>
-              <div class="network-id">${net.id}</div>
-            </div>
-            <span class="status-badge ${statusClass}">${isPrivate}</span>
-          </div>
-          <div class="network-description" title="${description}">${description}</div>
-          <div class="stats-row">
-            <div class="stat-item">
-              <span class="stat-value">${memberCount}</span>
-              <span class="stat-label">设备总数</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-value secondary">${authorizedMemberCount}</span>
-              <span class="stat-label">当前授权</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-value success">${onlineMemberCount}</span>
-              <span class="stat-label">当前在线</span>
-            </div>
-          </div>
-        `;
+              <div class="card-header ${isFirstRender ? 'animate-in' : ''}">
+                <div class="network-name" title="${config.name || '未命名'}">${config.name || '未命名'}</div>
+                ${clientNetHtml}
+                <span class="status-badge ${statusClass}">${isPrivate}</span>
+                <div class="member-menu" data-menu-for="${net.id}">
+                  <button class="menu-trigger" onclick="toggleMemberMenu(event, '${net.id}')" title="操作">⋯</button>
+                  <div class="menu-panel">
+                    <button class="menu-item" onclick="event.stopPropagation();
+                      document.getElementById('edit-panel-nodeId').innerHTML = '${net.id}';
+                    document.getElementById('edit-nodeId').value = '${net.id}';
+                    document.getElementById('edit-name').value = '${config.name || ''}';
+                    document.getElementById('edit-desc').value = \`${net.description || ''}\`;
+                    document.getElementById('edit-panel-mask').style.display = 'flex';
+
+                      closeAllMemberMenus();">
+                      📝 编辑信息
+                    </button>
+                    ${clientMenuHtml}
+                    <div class="menu-sep"></div>
+                    <button class="menu-item danger" onclick="event.stopPropagation(); removeMember('${net.id}'); closeAllMemberMenus();">
+                      🗑️ 移除网络
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="meta-row">
+                <div class="network-id">${net.id}</div>
+              <div class="network-description" title="${description}">${description}</div>
+              </div>
+
+              <div class="stats-row">
+                <div class="stat-item">
+                  <span class="stat-value">${memberCount}</span>
+                  <span class="stat-label">设备总数</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value secondary">${authorizedMemberCount}</span>
+                  <span class="stat-label">当前授权</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value success">${onlineMemberCount}</span>
+                  <span class="stat-label">当前在线</span>
+                </div>
+              </div>
+            `;
+
+
             networkGrid.appendChild(card);
             if (isFirstRender) {
                 setTimeout(() => {
@@ -983,6 +1406,68 @@
                 }, 400); // 等动画结束
             }
         });
+
+        let pendingSection = document.getElementById('pending-section');
+        pendingSection.hidden = true;
+        networkUnknown.innerHTML = '';
+        clientNetworks.forEach(net => {
+            if (clientNetworksFilter.has(net.id)) return;
+            pendingSection.hidden = false;
+            const card = document.createElement('div');
+            card.className = 'network-card';
+            // 跳转逻辑
+            // card.onclick = () => {
+            //     // var asda = `IP: ${net.assignedAddresses?.[0] || ''}
+            //     // `;
+            //     alert()
+            //     window.location.href = `dashboard?token=${encodeURIComponent(token)}&net_id=${encodeURIComponent(net.id)}&clientNet=true`;
+            // };
+            const isPrivate = net.type === "PRIVATE" ? '私有' : '公开';
+            const statusClass = net.private === "PRIVATE" ? 'public' : '';
+            let ff = 'danger';
+            let text = net.status;
+            if (net.status === 'OK') {
+                ff = 'success';
+                text = '连接正常';
+            } else if (net.status === 'ACCESS_DENIED') {
+                ff = 'warning';
+                text = '待授权';
+            }
+
+            card.innerHTML = `
+              <div class="card-header ${isFirstRender ? 'animate-in' : ''}">
+                <div class="network-name" title="${net.name || '未命名'}">${net.name || '未命名'}</div>
+                <span class="client-net ${ff}" title="${text}"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4.5 10.5C9.5 6 14.5 6 19.5 10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  <path d="M7.5 13.5C10.5 11 13.5 11 16.5 13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="12" cy="17" r="1.5" fill="currentColor" />
+</svg></span>
+                <span class="status-badge ${statusClass}">${isPrivate}</span>
+                <div class="member-menu" data-menu-for="${net.id + 1}">
+                  <button class="menu-trigger" onclick="toggleMemberMenu(event, '${net.id + 1}')" title="操作">⋯</button>
+                  <div class="menu-panel">
+                    <button class="menu-item danger" onclick="event.stopPropagation(); joinOrLeaveNet('${net.id}', false); closeAllMemberMenus();">
+                    🚪️ 离开网络
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="meta-row">
+              <div class="network-id">${net.id}</div>
+              </div>
+               <span class="" >${net.assignedAddresses?.[0] || ''}</span>
+
+            `;
+
+
+            networkUnknown.appendChild(card);
+            if (isFirstRender) {
+                setTimeout(() => {
+                    isFirstRender = false;
+                }, 400);
+            }
+        });
+
     }
 
     function showError(title, msg) {
@@ -992,10 +1477,124 @@
         errorMessage.textContent = msg;
     }
 
+    // 关闭弹窗
+    function closeEditPanel() {
+        document.getElementById('edit-panel-mask').style.display = 'none';
+    }
+
+    // ESC/点击遮罩关闭
+    document.getElementById('edit-panel-mask').addEventListener('mousedown', function (e) {
+        if (e.target === this) closeEditPanel();
+    });
+    document.getElementById('edit-cancel').onclick = closeEditPanel;
+    document.addEventListener('keydown', function (e) {
+        if (document.getElementById('edit-panel-mask').style.display !== 'none' && e.key === 'Escape') closeEditPanel();
+    });
+
+    // 表单保存事件
+    document.getElementById('edit-form').onsubmit = async function (e) {
+        e.preventDefault();
+        const nodeId = document.getElementById('edit-nodeId').value;
+        const name = document.getElementById('edit-name').value.trim();
+        const desc = document.getElementById('edit-desc').value.trim();
+
+        const saveBtn = document.getElementById('edit-save');
+        const cancelBtn = document.getElementById('edit-cancel');
+        if (!nodeId) return;
+
+        saveBtn.disabled = true;
+        cancelBtn.disabled = true;
+        const oldText = saveBtn.textContent;
+        saveBtn.innerHTML = '<span class="spinner1" style="margin-right:8px;"></span>保存中...';
+
+        try {
+            const res = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + nodeId)}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    config: {
+                        name,
+                        description: desc,
+                    }
+                })
+            });
+
+            if (res.ok) {
+                showToast('✅ 信息已更新');
+                await fetchData();
+                closeEditPanel();
+            } else {
+                if (res.status === 401) {
+                    showToast('❌ 更新失败: 无效访问令牌');
+                } else {
+                    showToast('❌ 更新失败: ' + res.statusText);
+                }
+            }
+        } catch (err) {
+            showToast('❌ 更新失败: ' + err.message);
+        } finally {
+            saveBtn.disabled = false;
+            cancelBtn.disabled = false;
+            saveBtn.textContent = oldText;
+        }
+    }
+
+    async function removeMember(netId) {
+        if (!confirm('确定删除此网络？')) return;
+        try {
+            const r = await fetch(`/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId)}`, {
+                method: 'DELETE'
+            });
+            if (!r.ok) {
+                if (r.status === 401) {
+                    throw new Error(`删除失败: 无效访问令牌`);
+                } else {
+                    throw new Error(`删除失败: ${r.statusText}`);
+                }
+            }
+            showToast('✅ 已删除');
+            await fetchData();
+        } catch (e) {
+            showToast('❌ ' + e.message);
+        }
+    }
+
+    async function joinOrLeaveNet(netId, isJoin) {
+        if (!isJoin && !confirm('确定离开此网络？')) return;
+
+        try {
+            let toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = "🔄 正在操作，请稍候";
+            toast.classList.add('show');
+            const r = await fetch(`/api?token=${encodeURIComponent(clientToken)}&path=${encodeURIComponent('/network/' + netId)}&server=${encodeURIComponent(server || 'localhost:9993')}`, {
+                method: isJoin ? 'POST' : 'DELETE'
+            });
+            if (!r.ok) {
+                if (r.status === 401) {
+                    throw new Error(`操作失败: 无效访问令牌`);
+                } else {
+                    throw new Error(`操作失败: ${r.statusText}`);
+                }
+            }
+            await fetchData();
+            toast.textContent = isJoin ? '✅ 已加入' : '✅ 已离开';
+        } catch (e) {
+            showToast('❌ ' + e.message);
+        } finally {
+            setTimeout(() => toast.classList.remove('show'), 2300);
+        }
+    }
+
+
+    async function fetchData() {
+        await init();
+    }
+
     // 启动
     init();
     updateTime();
-    setInterval(updateTime, 60000);
+    setInterval(fetchData, 60000);
 
     window.copyKanbanLink = copyKanbanLink;
 </script>
