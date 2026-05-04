@@ -21,6 +21,7 @@ async function handleApi(c: Context) {
 
     const token = c.req.query('token')
     const path = c.req.query('path')
+    const server = c.req.query('server')
 
     // 参数检查
     if (!token || !path) {
@@ -31,9 +32,9 @@ async function handleApi(c: Context) {
     }
 
     // 构建 ZeroTier API 请求
-    const apiUrl = `https://api.zerotier.com/api/v1${path}`
+    const apiUrl = server ? `http://${server}${path}` : `https://api.zerotier.com/api/v1${path}`
     const method = c.req.method.toUpperCase()
-    const headers: Record<string, string> =  {
+    const headers: Record<string, string> = server ? {'X-ZT1-Auth': token} : {
         'Authorization': `token ${token}`
     }
     // 只转发 content-type，如果存在
