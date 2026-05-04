@@ -806,7 +806,7 @@
     top: 38px;
     right: 0;
     width: 160px;
-    max-width: min(180px, 80vw);
+    max-width: min(110px, 80vw);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
