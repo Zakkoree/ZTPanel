@@ -190,6 +190,10 @@ function renderNetworks(networks, clientNetworks) {
                 <div class="member-menu" data-menu-for="${net.id}">
                   <button class="menu-trigger" onclick="toggleMemberMenu(event, '${net.id}')" title="操作">⋯</button>
                   <div class="menu-panel">
+                  <button class="menu-item" onclick="event.stopPropagation(); openPreModal('${net.id}'); closeAllMemberMenus();">
+                  🔍 查看数据
+                </button>
+                 <div class="menu-sep"></div>
                     <button class="menu-item" onclick="event.stopPropagation();
                       document.getElementById('edit-panel-nodeId').innerHTML = '${net.id}';
                     document.getElementById('edit-nodeId').value = '${net.id}';
@@ -417,6 +421,45 @@ async function joinOrLeaveNet(netId, isJoin) {
     }
 }
 
+
+function openPreModal(content) {
+    const mask = document.getElementById('pre-modal-mask');
+    const titleEl = document.getElementById('pre-modal-title');
+    const pre = document.getElementById('pre-modal-content');
+    titleEl.textContent = content;
+    allNetworks.some(e=>{
+        if(e.id === content){
+            pre.textContent = JSON.stringify(e, null, 2);
+        }
+    })
+    mask.style.display = 'flex';
+
+    // ESC 关闭
+    document.addEventListener('keydown', escCloseHandler);
+}
+
+function closePreModal() {
+    const mask = document.getElementById('pre-modal-mask');
+    mask.style.display = 'none';
+
+    document.removeEventListener('keydown', escCloseHandler);
+}
+
+function escCloseHandler(e) {
+    if (e.key === 'Escape') closePreModal();
+}
+
+function copyPreContent() {
+    const text = document.getElementById('pre-modal-content').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        showToast?.('已复制到剪贴板');
+    });
+}
+
+/* 点击遮罩关闭（点弹窗本身不会关） */
+document.getElementById('pre-modal-mask').addEventListener('click', e => {
+    if (e.target.id === 'pre-modal-mask') closePreModal();
+});
 
 async function fetchData() {
     await init();

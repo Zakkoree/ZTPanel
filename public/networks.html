@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="32x32">
     <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="192x192">
+    <link rel="stylesheet" href="./main.css">
     <link rel="stylesheet" href="./networks.css">
     <title>选择网络 - ZTPanel</title>
     <style>
@@ -81,7 +82,24 @@
         </div>
     </footer>
 </div>
+<!-- PRE 弹窗 -->
+<div id="pre-modal-mask" class="pre-modal-mask" style="display:none;">
+    <div class="pre-modal">
+        <div class="pre-modal-header">
+            <span id="pre-modal-title">内容预览</span>
+            <button class="pre-close-btn" onclick="closePreModal()">×</button>
+        </div>
 
+        <div class="pre-modal-body">
+            <pre id="pre-modal-content"></pre>
+        </div>
+
+        <div class="pre-modal-footer">
+            <button class="btn btn-outline" onclick="closePreModal()">关闭</button>
+            <button class="btn btn-primary" onclick="copyPreContent()">复制</button>
+        </div>
+    </div>
+</div>
 <!-- 编辑成员弹窗 -->
 <div id="edit-panel-mask" class="edit-mask" style="display:none;">
     <div class="edit-panel">

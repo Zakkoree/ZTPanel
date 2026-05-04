@@ -160,6 +160,8 @@ function renderMember(m, auth) {
         })
     }
 
+    let jsonText = JSON.stringify(m, null, 2);
+
     return `
         <div class="member-card ${isFirstRender ? 'animate-in' : ''}" data-section="authorized" data-online="${online ? 'yes' : 'no'}">
 
@@ -176,6 +178,10 @@ function renderMember(m, auth) {
 
               <button class="menu-trigger" onclick="toggleMemberMenu(event, '${m.nodeId}')" title="操作">⋯</button>
               <div class="menu-panel">
+                <button class="menu-item" onclick="event.stopPropagation(); openPreModal('${m.nodeId}'); closeAllMemberMenus();">
+                  🔍 查看数据
+                </button>
+                 <div class="menu-sep"></div>
                 <button class="menu-item" onclick="event.stopPropagation();
                 document.getElementById('edit-panel-nodeId').innerHTML = '${m.nodeId}';
                 document.getElementById('edit-nodeId').value = '${m.nodeId}';
@@ -352,7 +358,7 @@ function updateNetInfo(d) {
         document.getElementById('network-routes').innerHTML = Array.isArray(c.routes) && c.routes.length
             ? c.routes.map(route => {
                 const target = route.target || route.destination || '';
-                const via = (route.via ? ('via → ' + route.via) : (route.viaRouter ? ('via → ' + route.viaRouter) : ('(LAN) ' + ips)));
+                const via = (route.via ? ('via → ' + route.via) : '(LAN) ' + ips);
 
                 return `
               <div class="route-item-inline">
@@ -632,6 +638,44 @@ document.getElementById('edit-form').onsubmit = async function (e) {
         saveBtn.textContent = oldText;
     }
 }
+
+function openPreModal(content) {
+    const mask = document.getElementById('pre-modal-mask');
+    const titleEl = document.getElementById('pre-modal-title');
+    const pre = document.getElementById('pre-modal-content');
+    titleEl.textContent = content;
+    allMembers.some(e=>{
+        if(e.nodeId === content)
+            pre.textContent = JSON.stringify(e, null, 2);
+    })
+    mask.style.display = 'flex';
+
+    // ESC 关闭
+    document.addEventListener('keydown', escCloseHandler);
+}
+
+function closePreModal() {
+    const mask = document.getElementById('pre-modal-mask');
+    mask.style.display = 'none';
+
+    document.removeEventListener('keydown', escCloseHandler);
+}
+
+function escCloseHandler(e) {
+    if (e.key === 'Escape') closePreModal();
+}
+
+function copyPreContent() {
+    const text = document.getElementById('pre-modal-content').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        showToast?.('已复制到剪贴板');
+    });
+}
+
+/* 点击遮罩关闭（点弹窗本身不会关） */
+document.getElementById('pre-modal-mask').addEventListener('click', e => {
+    if (e.target.id === 'pre-modal-mask') closePreModal();
+});
 
 window.authorize = authorize;
 window.unauthorize = unauthorize;

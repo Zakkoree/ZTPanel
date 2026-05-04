@@ -6,6 +6,7 @@
     <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="32x32">
     <link rel="icon" href="https://www.zerotier.com/wp-content/uploads/2024/10/icon.svg" sizes="192x192">
     <title>ZTPanel</title>
+    <link rel="stylesheet" href="./main.css">
     <link rel="stylesheet" href="./dashboard.css">
     <style>
     </style>
@@ -33,13 +34,14 @@
     <div class="overview-card">
         <div class="overview-top">
             <div id="overview-title" class="overview-title">
-                <span>加载中...</span>
+                <span>loading...</span>
             </div>
         </div>
 
         <div class="overview-details">
             <div class="network-routes-container">
                 <div id="network-routes">
+                    loading...
                     <!-- 路由内容由 JS 动态填充 -->
                 </div>
             </div>
@@ -85,7 +87,7 @@
             </div>
         </div>
         <div class="members-grid" id="authorized-members">
-            <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 200px; padding: 2rem;">
+            <div class="grid-full">
                 <svg style="width: 32px; height: 32px; animation: spin 1s linear infinite; color: var(--primary);"
                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 3v3m6.364 3.364l-2.121 2.121M21 12h-3m-3.364 6.364l-2.121-2.121M12 21v-3m-6.364-3.364l2.121-2.121M3 12H6m3.364-6.364l2.121 2.121"
@@ -105,7 +107,18 @@
                     <span class="section-count" id="pending-count"></span>
                 </div>
             </div>
-            <div id="pending-members"></div>
+            <div id="pending-members">
+                <div style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 200px; padding: 2rem;">
+                    <svg style="width: 32px; height: 32px; animation: spin 1s linear infinite; color: var(--primary);"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 3v3m6.364 3.364l-2.121 2.121M21 12h-3m-3.364 6.364l-2.121-2.121M12 21v-3m-6.364-3.364l2.121-2.121M3 12H6m3.364-6.364l2.121 2.121"
+                              stroke-linecap="round"></path>
+                    </svg>
+                    <div style="margin-left: 1rem; font-size: 0.9rem; color: var(--text-light); display: flex; flex-direction: column; gap: 0.25rem;">
+                        <div>正在连接 ZeroTier 云端...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -163,6 +176,25 @@
         </form>
     </div>
 
+</div>
+
+<!-- PRE 弹窗 -->
+<div id="pre-modal-mask" class="pre-modal-mask" style="display:none;">
+    <div class="pre-modal">
+        <div class="pre-modal-header">
+            <span id="pre-modal-title">内容预览</span>
+            <button class="pre-close-btn" onclick="closePreModal()">×</button>
+        </div>
+
+        <div class="pre-modal-body">
+            <pre id="pre-modal-content"></pre>
+        </div>
+
+        <div class="pre-modal-footer">
+            <button class="btn btn-outline" onclick="closePreModal()">关闭</button>
+            <button class="btn btn-primary" onclick="copyPreContent()">复制</button>
+        </div>
+    </div>
 </div>
 <div id="toast" class="toast"></div>
 

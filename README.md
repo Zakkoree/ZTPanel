@@ -43,7 +43,7 @@ pnpm run deploy
 
 - 若首次部署会自动引导 Cloudflare 认证
 - 成功后会输出你的专属访问地址（如 `https://ztpanel.your_cloudflare_name.workers.dev`）
-
+- 国内访问 workers.dev 域名受限，最好配置添加自己域名
 ---
 
 ## 🧪 在线 DEMO
