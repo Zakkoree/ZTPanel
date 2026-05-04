@@ -611,11 +611,11 @@
         font-size: 1.15rem;
     }
 
-    .btn {
-        padding: 0.35rem 0.5rem;
-        font-size: 0.7rem;
-        min-height: 34px;
-    }
+    /*.btn {*/
+    /*    padding: 0.35rem 0.5rem;*/
+    /*    font-size: 0.7rem;*/
+    /*    min-height: 34px;*/
+    /*}*/
 
     .header-actions .btn {
         padding: 0.35rem 0.5rem;
