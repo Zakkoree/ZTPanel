@@ -246,9 +246,7 @@ body::before {
 
     /* 手机端缩小背景图 */
     .card::before {
-        width: 240px;
-        height: 240px;
-        opacity: 0.1;
+        display: none;
     }
 
     .header {
@@ -295,12 +293,6 @@ body::before {
 @media (max-width: 360px) {
     .card {
         padding: 1.25rem;
-    }
-
-    .card::before {
-        width: 200px;
-        height: 200px;
-        opacity: 0.08;
     }
 
     .logo img {
