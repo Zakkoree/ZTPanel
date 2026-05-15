@@ -2,6 +2,10 @@
 
 **ZTPanel** 是一个基于 **Cloudflare Worker** 和 **ZeroTier API** 的简洁管理面板，它可以帮助你快速查看和管理 ZeroTier 局域网设备。
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/Zakkoree/ZTPanel?style=social)](https://github.com/Zakkoree/ZTPanel/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Zakkoree/ZTPanel?style=social)](https://github.com/Zakkoree/ZTPanel/network/members)
+
 ---
 
 ## 🚀 主要功能
@@ -63,6 +67,16 @@ ps：使用url传参方式，你的浏览器浏览会有记录和开启Workers�
 
 **Q2：Token 怎么获取？**  
 A：[ZeroTier 官网 Token 获取地址](https://my.zerotier.com/account#tokens)
+
+---
+
+## ⭐️ 支持项目
+
+开发不易，如果这个项目对你有帮助，请给一个 **Star** ️，这将是对我最大的鼓励！
+
+如果你觉得项目不错，欢迎请作者喝杯咖啡：
+
+- **TRC20 (USDT)**: `TUEEWiF1vJZoHtDA1bSTFjt7FMD1cDhxTh`
 
 ---
 
