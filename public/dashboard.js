@@ -310,22 +310,15 @@ function getCached() {
     return null;
 }
 
-function setCached(d) {
-    try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify({t: Date.now(), d}));
-    } catch (e) {
-    }
-}
-
 async function fetchNet() {
-    const c = localStorage.getItem(NET_CACHE);
-    if (c) {
-        try {
-            updateNetInfo(JSON.parse(c));
-            return;
-        } catch (e) {
-        }
-    }
+    // const c = localStorage.getItem(NET_CACHE);
+    // if (c) {
+    //     try {
+    //         updateNetInfo(JSON.parse(c));
+    //         return;
+    //     } catch (e) {
+    //     }
+    // }
 
     const path = `/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId)}`;
     try {
@@ -358,7 +351,8 @@ function updateNetInfo(d) {
         document.getElementById('network-routes').innerHTML = Array.isArray(c.routes) && c.routes.length
             ? c.routes.map(route => {
                 const target = route.target || route.destination || '';
-                const via = (route.via ? ('via → ' + route.via) : '(LAN) ' + ips);
+                // const via = (route.via ? ('via → ' + route.via) : '(LAN) ' + ips);
+                const via = (route.via ? ('via → ' + route.via) : 'lan');
 
                 return `
               <div class="route-item-inline">
@@ -427,8 +421,8 @@ function renderData(d) {
 }
 
 async function fetchData() {
-    const c = getCached();
-    if (c) renderData(c);
+    // const c = getCached();
+    // if (c) renderData(c);
 
     const p = `/api?token=${encodeURIComponent(token)}&path=${encodeURIComponent('/network/' + netId + '/member')}`;
     try {
@@ -442,7 +436,7 @@ async function fetchData() {
         }
 
         const d = await r.json();
-        setCached(d);
+        localStorage.setItem(CACHE_KEY, JSON.stringify({t: Date.now(), d}));
         renderData(d);
     } catch (e) {
         errorMsg.style.display = 'block';
